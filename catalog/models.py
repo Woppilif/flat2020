@@ -10,16 +10,16 @@ class Flats(models.Model):
     status = models.BooleanField(blank=True, null=True,choices=FLAT_STATS)
     city = models.CharField(max_length=50, blank=True, null=True)
     address = models.CharField(max_length=80, blank=True, null=True)
-    flat = models.CharField(max_length=80, blank=True, null=True)
-    floor = models.IntegerField(blank=True, null=True)
+    flat = models.CharField(max_length=80, blank=True, null=True,default=0)
+    floor = models.IntegerField(blank=True, null=True,default=0)
     rooms = models.IntegerField(blank=True, null=True,default=1)
-    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    deposit = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    latitude = models.FloatField(blank=True, null=True)
-    longitude = models.FloatField(blank=True, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True,default=0)
+    deposit = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True,default=0)
+    latitude = models.FloatField(blank=True, null=True,default=0)
+    longitude = models.FloatField(blank=True, null=True,default=0)
     description = models.TextField(blank=True, null=True)
     hint = models.CharField(max_length=50, blank=True, null=True)
-    cleaning_time = models.TimeField(blank=True, null=True,default="3:00")
+    cleaning_time = models.TimeField(blank=True, null=True,default="2:00")
     metro_station = models.CharField(max_length=60, blank=True, null=True)
     bxcal_id = models.IntegerField(blank=True, null=True,default=None)
     internal_id = models.CharField(max_length=60, blank=True, null=True)
@@ -28,17 +28,20 @@ class Flats(models.Model):
         verbose_name = 'Квартира'
         verbose_name_plural = 'Квартиры'
 
+    def __str__(self):
+        return "{0}".format(self.address)
+
     def addImages(self,images_list = []):
         for i in images_list:
-            Images.objects.create(flat=self,img_url=i,urled=True)
+            Images.objects.update_or_create(flat=self,img_url=i,urled=True)
         return True
 
     def addItems(self, items_list = []):
         for i in items_list:
-            FlatsItems.objects.create(falt_id=self.pk,item_name=i[0],item_count=i[1])
+            FlatsItems.objects.update_or_create(flat=self,item_name=i,item_count=1)
         return True
 
-    def flatsItems(self):
+    def getItems(self):
         return FlatsItems.objects.filter(flat=self)
 
     def getImages(self):

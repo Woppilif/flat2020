@@ -37,7 +37,7 @@ class Bitx():
     def split(self,string):
         if len(string) < 1:
             return []
-        return [i.strip() for i in string.split(';')]
+        return [i.strip().replace('.','')[:50] for i in string.split(';')]
 
     def create(self,data):
         self.internal_id = data.get("internal-id")
@@ -50,14 +50,13 @@ class Bitx():
         self.location['city'] = data.find("locality-name").get_text(strip=True)
         self.location['address'] = data.find("address").get_text(strip=True)
         self.location['flat_number'] = self.find(data,"kvflash")
-        self.location['items'] = self.split(self.find(data,"comentflash"))
+        self.items = self.split(self.find(data,"comentflash"))
         self.location['metro'] = data.find("metro").contents[0].get_text(strip=True)
         coords = data.find("latitude-longitude")
         if coords is not None:
             coords = coords.get_text(strip=True).split(',')
-            print(coords)
-            #self.location['latitude'] = coords[0]
-            #self.location['longitude'] = coords[1]
+            self.location['latitude'] = coords[0]
+            self.location['longitude'] = coords[1]
         self.description = data.find("description").get_text(strip=True).replace("ЗАСЕЛЕНИЕ КРУГЛОСУТОЧНО!!!","")
         for i in data.find_all("image"):
             self.images.append(i.get_text(strip=True))
