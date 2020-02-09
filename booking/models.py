@@ -2,32 +2,63 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import timedelta
 from django.utils.timezone import now
+from django.db.models import Q
 # Create your models here.
 
 class BookingExt(models.Manager):
 
+    def createBooking(self,user,flat,days):
+        current = self.getCurrentRenta(flat)
+        if current is not None:
+            return None
+        future = self.getFirstFutureRenta(flat)
+        date = now()
+        if future is not None:
+            free_days = abs((date - future.start).days)
+            if days > free_days:
+                return None
+        if days > 100:
+            return None 
+        return self.create(
+                flat = flat,
+                rentor = user,
+                start = date,
+                end = date + timedelta(days=days),
+                status = 'pending',
+                paid=False,
+                created_at = date
+            ).setDates().setBookingEnding()
+
     def getCurrentRenta(self,flat):
         date = now()
-        return self.filter(flat=flat,start__lte=date,end__gte=date,status=True,paid=True).last()
+        return self.filter(flat=flat,start__lte=date,end__gte=date,status='succeeded',paid=True).last()
 
-    def getFirstFutureRenta(self,flat):#
+    def getFirstFutureRenta(self,flat):
         date = now()
-        return self.filter(flat=flat,start__gte=date,status=True,paid=True).last()
+        return self.filter(flat=flat,start__gte=date,status='succeeded',paid=True).last()
 
     def getAll(self,flats_queryset):
         '''
-        Function returns all flats to map
+        Function returns all flats to map which are not rented yet and booking_ending is not expired
         '''
         date = now()
-        return self.filter(flat__in=flats_queryset,booking_end__gt=date)
+        b = [i.flat.pk for i in self.filter(Q(status='pending') | Q(status='waiting_for_capture'),flat__in=flats_queryset,booking_end__gt=date,start__lt=date,paid=False)]
+        flats_queryset = flats_queryset.exclude(id__in=b)
+        return flats_queryset
 
 class Booking(models.Model):
+    BOOKING_STATS = (
+        ('pending', 'Создана'), # Статус сразу после создания аренды
+        ('waiting_for_capture', 'Ожидает подтверждения от пользователя'), #Был начат осмотр кв
+        ('succeeded', 'Подтверждена \ активна'), # Успешно оплачена
+        ('canceled', 'Отменена') # отказ клиентом от аренды
+    )
     flat = models.ForeignKey('catalog.Flats', on_delete=models.CASCADE,related_name="Квартира",related_query_name="Квартира")
     rentor = models.ForeignKey(User, models.DO_NOTHING)
     start = models.DateTimeField(verbose_name='Начало аренды',null=True,default=None)
     end = models.DateTimeField(verbose_name='Окончание аренды',null=True,default=None)
     booking_end = models.DateTimeField(null=True,blank=True,verbose_name='Окончание бронироваия',default=None)
-    status = models.BooleanField(null=True,default=False)
+    status = models.CharField(max_length=30,null=True,default='pending',choices=BOOKING_STATS)
     paid = models.BooleanField(null=True,default=False)
     created_at = models.DateTimeField(null=True,blank=True,default=None)
     trial_key = models.CharField(max_length=80, blank=True, null=True,default=None)
@@ -43,6 +74,37 @@ class Booking(models.Model):
         verbose_name_plural = 'Аренды'
         ordering = ['-start']
 
+    def timeIsUp(self):
+        '''
+            Send signal if booking time is up then do smth
+        '''
+        if now() > self.booking_end:
+            return True
+        return False
+
+    def cancel(self):
+        if self.status != 'succeeded':
+            self.status = 'canceled'
+            self.save()
+        return self
+
+    def activate(self):
+        if self.status != 'succeeded':
+            self.status = 'succeeded'
+            self.paid = True
+            self.save()
+        return self
+    
+    def overviewStart(self):
+        if self.status == 'pending':
+            self.booking_end = now() + timedelta(minutes=10)
+            self.status = 'waiting_for_capture'
+            self.save()
+        return self
+
+    def getRemainingBookingTime(self):
+        return (str(self.booking_end - now())[:7]).replace('days','дней')
+
     def getRealEnding(self):
         return self.end + timedelta(hours=self.flat.cleaning_time.hour,minutes=self.flat.cleaning_time.minute)
 
@@ -51,7 +113,7 @@ class Booking(models.Model):
         set booking ending time
         '''
         print("setBookingEnding")
-        self.booking_end = self.created_at + timedelta(hours=self.calcBookingEnding())
+        self.booking_end = self.created_at.replace(second=0) + timedelta(hours=self.calcBookingEnding(),seconds=0)
         print(self.booking_end)
         self.save()
         return self
