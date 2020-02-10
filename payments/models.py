@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import uuid
+from django.db.models import Q
 from django.utils.timezone import now
 from yandex_checkout import Payment,Configuration 
 from django.conf import settings
@@ -10,10 +11,15 @@ Configuration.secret_key = settings.YA_SECRET_KEY
 
 class YandexPayments(models.Manager):
 
+    def getCurrentTransaction(self,user):
+        return self.filter(~Q(status="succeeded") | ~Q(status="canceled"),user=user,checkouted=False).last()
+
     def createPayment(self,user,amount,booking=None,payment_type=False):
         '''
             Create yandex kassa payment object. payment_type = True - autopayment otherwise is add card
         '''
+        if self.getCurrentTransaction(user) is not None:
+            return self.getCurrentTransaction(user).getInfo()
         payment_info = {
             "amount": {
                 "value": amount,
@@ -38,7 +44,8 @@ class YandexPayments(models.Manager):
             payment_type = pt,
             payment_id = payment_object.id,
             created_at = payment_object.created_at,
-            expires_at = payment_object.expires_at
+            expires_at = payment_object.expires_at,
+            checkouted = False
         )
         return payment_object
 
@@ -52,7 +59,7 @@ class YandexPayments(models.Manager):
             "confirmation": {
                 "type": "embedded"
             },
-            "capture": True,
+            "capture": False,
             "save_payment_method": True,
         }
 
@@ -78,24 +85,6 @@ class YandexPayments(models.Manager):
                 ]
             }
         }
-    
-    def getInfo(self,id):
-        return Payment.find_one(id)
-
-    def capture(self):
-        return Payment.capture(
-            self.payment_id,
-            {
-                "amount": {
-                    "value": self.price,
-                    "currency": "RUB"
-                }
-            },
-            str(uuid.uuid4()) #idempotence key
-        )
-
-    def cancel(self):
-        Payment.cancel(self.payment_id,str(uuid.uuid4()))
 
 
 class Transactions(models.Model):
@@ -121,6 +110,7 @@ class Transactions(models.Model):
     created_at = models.DateTimeField(null=True,blank=True)
     expires_at = models.DateTimeField(null=True,blank=True)
     captured_at = models.DateTimeField(null=True,blank=True)
+    checkouted = models.BooleanField(null=False,default=False,blank=False)
 
     yandex = YandexPayments()
     objects = models.Manager()
@@ -139,6 +129,43 @@ class Transactions(models.Model):
         self.expires_at = paymentObject.expires_at
         self.save()
         return self
+
+    def capture(self):
+        return Payment.capture(
+            self.payment_id,
+            {
+                "amount": {
+                    "value": self.price,
+                    "currency": "RUB"
+                }
+            },
+            str(uuid.uuid4()) #idempotence key
+        )
+
+    def getInfo(self):
+        return Payment.find_one(self.payment_id)
+
+    def cancel(self):
+        Payment.cancel(self.payment_id,str(uuid.uuid4()))
+
+    def checkout(self):
+        if checkouted == True:
+            return False
+        if self.payment_type == "account":
+            self.cancel()
+            self.setInfo(self.getInfo())
+            self.user.documents.addCard(self.getInfo())
+            self.checkouted = True
+            self.save()
+            return True
+        else:
+            #self.booking.activate()
+            self.checkouted = True
+            self.save()
+            return True
+        return False
+        
+
 
 
     
