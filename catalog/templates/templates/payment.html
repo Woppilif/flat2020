@@ -1,0 +1,40 @@
+{% extends 'includes/main.html' %}
+{% load static %}
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<section class="contr" id="contr"> 
+    <div class="container">
+        <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+            <div class="col-md-12">
+                <h1>Привязка карты к аккаунту</h1>
+            </div>
+            
+            <div class="col-md-12">
+                <div id="payment-form"></div>
+                <p>После привязки карты с нее спишется 1 рубль и сразу же будет возвращён. Для просмотра всех транзакций Вы можете зайти в раздел настройки.</p>
+            </div>
+            
+        
+      </div>
+  </section>
+
+{% endblock %}
+
+{% block javascript %}
+
+<script src="https://kassa.yandex.ru/checkout-ui/v2.js"></script>
+<script>
+    //Инициализация виджета. Все параметры обязательные.
+    const checkout = new window.YandexCheckout({
+        confirmation_token: '{{payment.confirmation.confirmation_token}}', //Токен, который перед проведением оплаты нужно получить от Яндекс.Кассы
+        return_url: "{% url 'rents:card' code=id %}", //Ссылка на страницу завершения оплаты
+        error_callback(error) {
+            //Обработка ошибок инициализации
+        }
+    });
+    
+    //Отображение платежной формы в контейнере
+    checkout.render('payment-form');
+</script>
+{% endblock %}

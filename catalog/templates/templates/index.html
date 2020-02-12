@@ -1,0 +1,22 @@
+{% extends 'includes/main.html' %}
+{% load static %}
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<header class="bg-primary text-white" id="hhddrr">
+    <div class="container text-center">
+      <h1>FlatSharing</h1>
+      <p class="lead">Сервис посуточной аренды квартир</p>
+      <a href="{% url 'login' %}" class="btn btn-success btn-lg btn-block">Вход и регистрация</a>
+    </div>
+  </header>
+  <footer class="py-1 bg-dark fixed-bottom">
+    <div class="container">
+      <p class="m-0 text-center text-white">Architecton &copy; 2020</p>
+    </div>
+    <!-- /.container -->
+  </footer>
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

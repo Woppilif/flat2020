@@ -1,0 +1,129 @@
+{% extends 'includes/main.html' %}
+{% load static %}
+{% load l10n %}
+{% block title %}Карта{% endblock %}
+
+{% block content %}
+<header class="bg-while text-white"  id="map"></header>
+
+<footer class="py-1 bg-dark fixed-bottom">
+  <div class="container">
+      <div class="row">
+          <div class="col-md-12">
+              <a href="{% url 'catalog:list' %}" class="btn btn-lg btn-block btn-primary" id="showAsList">Показать списком</a>
+          </div>
+      </div>
+  </div>
+</footer>
+{% endblock %}
+
+{% block javascript %}
+<script src="https://maps.api.2gis.ru/2.0/loader.js?pkg=full"></script>
+<script>
+
+    $(document).ready(function(){ 
+      if(window.location.href.split('?').length == 2)
+      showAsList.href = "{% url 'catalog:list' %}?"+window.location.href.split('?')[1];
+    })
+
+
+    var map, markers, ddt;
+
+
+    
+    DG.then(function() {
+        
+
+        var container = document.createElement('div'),
+                    mapBlock = document.getElementById('map'),
+                    markers = DG.featureGroup();
+
+        container.id = 'map';
+
+
+        mapBlock.appendChild(container);
+
+        map = DG.map('map', {
+            center: [55.752114, 37.62017],
+            zoom: 10,
+            fullscreenControl: false,
+            zoomControl: false,
+            width:"100%"
+        });
+
+        {%for flat in flats%}
+            {% if flat.latitude is not None and flat.longitude is not None%}
+            DG.marker([{{flat.latitude|unlocalize}}, {{flat.longitude|unlocalize}}]).addTo(markers).bindLabel('{{flat.address}}').on('click', function () {
+                window.location.replace("{% url 'catalog:apartment' flat.pk %}");
+            });
+            {%endif%}
+        {%endfor%}
+
+
+        markers.addTo(map);
+        
+        map.locate({setView: true, watch: false})
+            .on('locationfound', function(e) {
+                DG.marker([e.latitude, e.longitude]).addTo(map).bindPopup('Вы находитесь здесь!');
+            })
+            .on('locationerror', function(e) {
+                DG.popup()
+                    .setLatLng(map.getCenter())
+                    .setContent('Доступ к определению местоположения отключён')
+                    .openOn(map);
+            });
+
+        document.getElementById('ex2').onchange = showMarkers;
+        document.getElementById('start_date').onchange = showMarkers;
+        document.getElementById('end_date').onchange = showMarkers;
+        document.getElementById('rooms').onchange = showMarkers;
+        //document.getElementById('radius').onchange = showMarkers;
+
+
+        function showMarkers() {
+          markers.removeFrom(map);
+          markers = DG.featureGroup();
+          var promise = DG.ajax('/map/', {
+            type: 'get',
+            data: {
+                min: parseInt(ex2.value.split(',')[0]),
+                max: parseInt(ex2.value.split(',')[1]),
+                start: start_date.value.substr(0,10),
+                end: end_date.value.substr(0,10),
+                rooms: rooms.value,
+                api:true
+            },
+            success: function(data) {
+                data.flats.forEach(element => {
+                  console.log('success', element);
+                  DG.marker([element[1], element[2]]).addTo(markers).on('click', function () {
+                    window.location.replace("/apartment/"+element[0]+" ");
+                });
+                  
+                  
+                });
+                console.log('success', data.flats);
+                ddt = data.flats;
+            },
+            error: function(error) {
+                console.log('error', error);
+            }
+          });
+          markers.addTo(map);
+
+          showAsList.href = "{% url 'catalog:list' %}?min="+parseInt(ex2.value.split(',')[0])+"&max="+parseInt(ex2.value.split(',')[1])+"&start="+start_date.value.substr(0,10)+"&end="+end_date.value.substr(0,10)+"&rooms="+rooms.value+""
+
+        };
+    });
+
+    $("#ex2").slider({});
+    $("#ex2").on("load", function(){
+      $("#ex6SliderVal").text("от "+slideEvt.value[0]+" до "+slideEvt.value[1]);
+      $("#ex6SliderVal").val(slideEvt.value);
+    });
+ $("#ex2").on("slide", function(slideEvt) {
+  $("#ex6SliderVal").text("от "+slideEvt.value[0]+" до "+slideEvt.value[1]);
+  $("#ex6SliderVal").val(slideEvt.value);
+});
+</script>
+{% endblock %}

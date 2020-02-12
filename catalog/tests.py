@@ -4,7 +4,7 @@ from managing.models import Partners
 from django.contrib.auth.models import User
 import requests
 from catalog.modules import bitx
-
+from catalog.modules import pagination
 # Create your tests here.
 '''
 class FlatsTest(TestCase):
@@ -33,7 +33,7 @@ class FlatsTest(TestCase):
         flats = Flats.objects.all()
         for i in flats:
             print(i.getItems())
-'''
+
 
 def pool():
     flats = bitx.Soap().getAll()
@@ -57,3 +57,5 @@ def pool():
             flat.addItems(i.items)
 
 pool()
+'''
+

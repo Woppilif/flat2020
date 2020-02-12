@@ -1,0 +1,47 @@
+{% extends 'includes/main.html' %}
+{% load static %}
+{% block content %}
+{% load widget_tweaks %}
+
+<section class="contr" id="contr">
+    <div class="container p-4 justify-content-center">
+		<h1>Пройдём короткую регистрацию</h1>
+            <form method="POST">
+				{% csrf_token %}
+				{% for field in form %}
+				<div class="form-group{% if field.errors %} has-error{% endif %}">
+					<div class="{{ field.help_text }}">
+					<p>{{ field.label }}</p>
+					{% render_field field class="form-control login" %}
+					</div>
+					{% for error in field.errors %}
+						<p class="help-block" style="color: red;">{{ error }}</p>
+					{% endfor %}
+				</div>
+				{% endfor %}
+                <button type="submit" class="btn btn-lg btn-block  btn-primary">Регистрация</button>
+              </form>
+            
+   
+
+
+    </div>
+
+    
+
+  </section>
+
+  <footer class="py-1 bg-dark fixed-bottom">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <a href="{%url 'login' %}" type="button" class="btn btn-lg btn-block btn-primary">Войти</a>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'password_reset' %}" class="btn btn-lg btn-block btn-secondary">Восстановить пароль</a>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+  </footer>
+{% endblock %}
