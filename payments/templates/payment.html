@@ -1,20 +1,18 @@
+{% extends 'includes/main.html' %}
 {% load static %}
 {% block title %}Главная{% endblock %}
 
 {% block content %}
 <section class="contr" id="contr"> 
     <div class="container">
-        <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-            <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-12 text-center">
                 <h1>Привязка карты к аккаунту</h1>
-            </div>
-            
-            <div class="col-md-12">
-                <div id="payment-form"></div>
                 <p>После привязки карты с нее спишется 1 рубль и сразу же будет возвращён. Для просмотра всех транзакций Вы можете зайти в раздел настройки.</p>
-            </div>
-            
-        
+            </div>            
+        </div>
+        <div id="payment-form"></div>
+        <a href="{%url 'catalog:map' %}">Пропустить этот шаг</a>
       </div>
   </section>
 

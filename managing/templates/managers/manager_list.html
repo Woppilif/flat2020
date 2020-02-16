@@ -1,0 +1,43 @@
+{% extends 'mangrs.html' %}
+
+{% load static %}
+
+{% block javascript %}
+    <script src="{% static 'managers/js/managers.js' %}"></script>
+    
+    {% endblock %}
+
+{% block content %}
+  <h1 class="page-header">Квартиры</h1>
+
+  <p>
+    <button type="button" class="btn btn-primary js-create-book" data-url="{% url 'sharing:manager_create' %}">
+      <span class="glyphicon glyphicon-plus"></span>
+      Добавить аренду
+    </button>
+  </p>
+
+  <table class="table" id="book-table">
+    <thead>
+      <tr>
+        <th>Адрес</th>
+        <th>Стоимосить аренды \ депозит</th>
+        <th>Оплата в час</th>
+        <th>Статус</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% include 'managers/includes/partial_book_list.html' %}
+    </tbody>
+  </table>
+
+  <div class="modal fade" id="modal-book">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

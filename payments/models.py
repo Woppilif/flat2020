@@ -11,21 +11,26 @@ Configuration.secret_key = settings.YA_SECRET_KEY
 
 class YandexPayments(models.Manager):
 
-    def getCurrentTransaction(self,user):
-        return self.filter(~Q(status="succeeded") | ~Q(status="canceled"),user=user,checkouted=False).last()
+    def getCurrentTransaction(self,user,amount,booking=None,payment_type=False):
+        if payment_type is True:
+            pt = 'full'
+        elif payment_type is False:
+            pt = 'account'
+        return self.filter(Q(status="pending") | Q(status="waiting_for_capture"),user=user,checkouted=False,price=amount,booking=booking,payment_type = pt).last()
 
     def createPayment(self,user,amount,booking=None,payment_type=False):
         '''
             Create yandex kassa payment object. payment_type = True - autopayment otherwise is add card
         '''
-        if self.getCurrentTransaction(user) is not None:
-            return self.getCurrentTransaction(user).getInfo()
+        if self.getCurrentTransaction(user,amount,booking,payment_type) is not None:
+            print("Yes getCurrentTransaction")
+            return self.getCurrentTransaction(user,amount,booking,payment_type).getInfo()
         payment_info = {
             "amount": {
                 "value": amount,
                 "currency": "RUB"
             },
-            "description": "TEST! Привязка карты"
+            "description": "Привязка карты"
         }
         payment_info.update(self.createReceipt(user,amount))
         if payment_type is True:
@@ -89,7 +94,7 @@ class YandexPayments(models.Manager):
 
 class Transactions(models.Model):
     P_TYPES = (
-        ('account', 'Подтверждение аккаунта'),
+        ('account', 'Привязка карты'),
         ('deposit', 'Депозит'),
         ('full', 'Полная стоимость'),
         ('usercard', 'Оплата картой клиента')
@@ -149,7 +154,7 @@ class Transactions(models.Model):
         Payment.cancel(self.payment_id,str(uuid.uuid4()))
 
     def checkout(self):
-        if checkouted == True:
+        if self.checkouted == True:
             return False
         if self.payment_type == "account":
             self.cancel()
@@ -159,7 +164,7 @@ class Transactions(models.Model):
             self.save()
             return True
         else:
-            #self.booking.activate()
+            self.booking.activate()
             self.checkouted = True
             self.save()
             return True

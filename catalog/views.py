@@ -3,12 +3,22 @@ from catalog.models import Flats
 from booking.models import Booking
 from catalog.modules import pagination
 from booking.froms import RentForm
+from django.contrib.auth.decorators import login_required
+from users.views import sendToBooking, sendToBookingInner, checkcard, checkDocuments
 # Create your views here.
+@login_required(login_url='/accounts/login/')
+@checkDocuments
+@sendToBooking
+@sendToBookingInner
 def index(request):
     flats = Flats.objects.filter(status=True)
     flats = Booking.extended.getAll(flats)
     return render(request, 'catalog/map.html', {"flats":flats})
 
+@login_required(login_url='/accounts/login/')
+@checkDocuments
+@sendToBooking
+@sendToBookingInner
 def clist(request,offset=1):
     flats = Flats.objects.filter(status=True)
     flats = Booking.extended.getAll(flats)
@@ -16,6 +26,10 @@ def clist(request,offset=1):
     flats = pages.getPaginated()
     return render(request, 'catalog/list.html', {"flats":flats,"pages":pages})
 
+@login_required(login_url='/accounts/login/')
+@checkDocuments
+@sendToBooking
+@sendToBookingInner
 def apartment(request,pk=None):
     flat = get_object_or_404(Flats, pk=pk)
     untill = Booking.extended.getDaysBeforeRenta(flat)

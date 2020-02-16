@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+import uuid
+import os
 # Create your models here.
 
 def get_file_path_users(instance, filename):
@@ -23,6 +25,8 @@ class Documents(models.Model):
     ya_card_type = models.CharField(max_length=50,default=None, blank=True, null=True)
     ya_card_last4 = models.CharField(max_length=4,default=None, blank=True, null=True)
     totlal_cancelation = models.IntegerField(null=True,default=0,blank=True)    
+    bonus = models.IntegerField(default=0,blank=True,null=True)
+    ref_link = models.CharField(max_length=50,default=None, blank=True, null=True)
 
     def __str__(self):
         return str(self.user)
@@ -30,6 +34,10 @@ class Documents(models.Model):
     class Meta:
         verbose_name = 'Документы пользователей'
         verbose_name_plural = 'Документы пользователей'
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return "{0}?ref={1}".format(reverse('users:registration'),self.ref_link) 
 
     def addCard(self,payment):
         self.yakey = payment.payment_method.id

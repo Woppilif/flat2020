@@ -20,7 +20,7 @@
             1. Принимающая сторона передала, а Гость принял {{renta.flat.rooms}} комнатную квартиру на период с {{renta.start}} по {{renta.end}}, расположенную по адресу: {{renta.flat.addressPartOne}} {{renta.flat.addressPartTwo}}, во временное владение и пользование, а также следующее имущество:
           </br>
           <ul>
-            {% for item in renta.flat.flatsItems%}
+            {% for item in renta.flat.getItems%}
             <li>{{item}}</li>
             {%endfor%}
         </ul>
@@ -37,7 +37,7 @@
       {% csrf_token %}
     <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
       <div class="col-md-12 d-4 d-lg-block">
-        <button type="submit" class="btn btn-lg btn-block btn-outline-secondary" name="open">Открыть дверь | {{renta.AccessObj.timeRemaining}}</button>
+        <button type="submit" class="btn btn-lg btn-block btn-outline-secondary" name="open">Открыть дверь | {{renta.getRemainingBookingTime}}</button>
       </div>
   </div>
     </div>

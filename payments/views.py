@@ -1,16 +1,18 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 from payments.models import Transactions
 # Create your views here.
+@login_required(login_url='/accounts/login/')
 def index(request):
     t =  Transactions.yandex.createPayment(
         request.user,
-        100
+        1
     )
-    print(t.id)
     return render(request, 'payment.html', {'transaction':t})
 
+@login_required(login_url='/accounts/login/')
 def capture(request,id):
     transaction = get_object_or_404(Transactions,checkouted = False, payment_id = id)
     transaction.setInfo(transaction.getInfo())
@@ -24,15 +26,4 @@ def capture(request,id):
         return redirect('payments:index')
     if transaction.status == "succeeded":
         transaction.checkout()
-    return HttpResponse(transaction.status)
-
-#TO/DO
-#create userdocuments +
-#save payment meth +
-#test autopayment +
-#unlink card +/-
-#exclude transaction flood +
-#booking checkout +
-
-
-#TO/DO
+    return redirect('catalog:map')

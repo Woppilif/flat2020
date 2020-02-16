@@ -7,6 +7,9 @@ from django.db.models import Q
 
 class BookingExt(models.Manager):
 
+    def getCurrentUserRenta(self,user):
+        return self.filter(~Q(status='canceled'),rentor=user).last()
+    
     def createBooking(self,user,flat,days):
         current = self.getCurrentRenta(flat)
         if current is not None:
@@ -51,7 +54,6 @@ class BookingExt(models.Manager):
         date = now()
         b = [i.flat.pk for i in self.filter(~Q(status='canceled'),flat__in=flats_queryset)]
         #,booking_end__gt=date,start__lt=date,paid=False
-        print(b)
         flats_queryset = flats_queryset.exclude(id__in=b)
         return flats_queryset
 
@@ -87,8 +89,12 @@ class Booking(models.Model):
         '''
             Send signal if booking time is up then do smth
         '''
-        if now() > self.booking_end:
-            return True
+        if self.paid is False:
+            if now() > self.booking_end:
+                return True
+        elif self.paid is True:
+            if now() > self.end:
+                return True
         return False
 
     def cancel(self):
@@ -103,6 +109,12 @@ class Booking(models.Model):
             self.paid = True
             self.save()
         return self
+
+    def deactivate(self):
+        if self.status == 'succeeded':
+            self.status = 'canceled'
+            self.save()
+        return self
     
     def overviewStart(self):
         if self.status == 'pending':
@@ -112,7 +124,13 @@ class Booking(models.Model):
         return self
 
     def getRemainingBookingTime(self):
-        return (str(self.booking_end - now())[:7]).replace('days','дней')
+        if self.paid is False:
+            point = self.booking_end
+        else:
+            point = self.end
+        if point < now():
+            return "Время вышло"
+        return (str(point - now())[:7]).replace('days','дней')
 
     def getRealEnding(self):
         return self.end + timedelta(hours=self.flat.cleaning_time.hour,minutes=self.flat.cleaning_time.minute)
@@ -121,9 +139,7 @@ class Booking(models.Model):
         '''
         set booking ending time
         '''
-        print("setBookingEnding")
         self.booking_end = self.created_at.replace(second=0) + timedelta(hours=self.calcBookingEnding(),seconds=0)
-        print(self.booking_end)
         self.save()
         return self
     
@@ -143,10 +159,8 @@ class Booking(models.Model):
         '''
         Set Start to 14h.0m and end to 12h.0m
         '''
-        print("setDates")
         self.start = self.start.replace(hour=11,minute=0,second=0)
         self.end = self.end.replace(hour=9,minute=0,second=0)
-        print(self.start,self.end)
         self.save()
         return self
 

@@ -53,9 +53,12 @@
  
       <div class="container">
           <div class="row">
-              <div class="col-md-12">
-                  <button type="submit" class="btn btn-lg btn-block btn-primary" name="open">Открыть дверь | {{renta.AccessObj.timeRemaining}}</button>
+              <div class="col-md-8">
+                  <button type="submit" class="btn btn-lg btn-block btn-primary" name="open">Открыть дверь | {{renta.getRemainingBookingTime}}</button>
               </div>
+              <div class="col-md-4 padd">
+                <button class="btn btn-lg btn-block btn-secondary">Информация</button>
+            </div>
           </div>
       </div>
   </form>
@@ -98,7 +101,7 @@
 
         {% if renta.flat.latitude is not None and renta.flat.longitude is not None%}
         DG.marker([{{renta.flat.latitude|unlocalize}}, {{renta.flat.longitude|unlocalize}}]).addTo(markers).on('click', function () {
-            window.location.replace("{% url 'rents:apartment' renta.flat.pk %}");
+            window.location.replace("{% url 'catalog:apartment' renta.flat.pk %}");
         });
         {%endif%}
 

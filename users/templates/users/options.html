@@ -1,0 +1,207 @@
+{% extends 'includes/main.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<section class="contr" id="contr">
+    <div class="container">
+        <div class="row my-2">
+            <div class="col-lg-8 order-lg-2">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a href="" data-target="#profile" data-toggle="tab" class="nav-link active">Профиль</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="" data-target="#messages" data-toggle="tab" class="nav-link">Платёжные данные</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="" data-target="#edit" data-toggle="tab" class="nav-link">Настройки</a>
+                    </li>
+                </ul>
+                <div class="tab-content py-4">
+                    <div class="tab-pane active" id="profile">
+                        <!--<h5 class="mb-3">User Profile</h5>-->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Мои бонусы</h6>
+                                <p>
+                                    На вашем счету: {{user.documents.bonus}}
+                                </p>
+                                <h6>Реферальная ссылка</h6>
+                                <p>
+                                    {{user.documents.get_absolute_url}}
+                                </p>
+                            </div>
+                            <!--<div class="col-md-6">
+                                <h6>Recent badges</h6>
+                                <a href="#" class="badge badge-dark badge-pill">html5</a>
+                                <a href="#" class="badge badge-dark badge-pill">react</a>
+                                <a href="#" class="badge badge-dark badge-pill">codeply</a>
+                                <a href="#" class="badge badge-dark badge-pill">angularjs</a>
+                                <a href="#" class="badge badge-dark badge-pill">css3</a>
+                                <a href="#" class="badge badge-dark badge-pill">jquery</a>
+                                <a href="#" class="badge badge-dark badge-pill">bootstrap</a>
+                                <a href="#" class="badge badge-dark badge-pill">responsive-design</a>
+                                <hr>
+                                <span class="badge badge-primary"><i class="fa fa-user"></i> 900 Followers</span>
+                                <span class="badge badge-success"><i class="fa fa-cog"></i> 43 Forks</span>
+                                <span class="badge badge-danger"><i class="fa fa-eye"></i> 245 Views</span>
+                            </div>-->
+                            <div class="col-md-12">
+                                <h5 class="mt-2"><span class="fa fa-clock-o ion-clock float-right"></span> Последние аренды</h5>
+                                <table class="table table-sm table-hover table-striped">
+                                    <tbody> 
+                                        {%for item in rents%}
+                                        <tr>
+                                            <td>
+                                                <strong>{{item.flat}}</strong> / <strong>{{item.start}} по {{item.end}}</strong> {{item.get_status_display}}
+                                            </td>
+                                        </tr>
+                                        {%endfor%}
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!--/row-->
+                    </div>
+                    <div class="tab-pane" id="messages">
+                        <div class="alert alert-info alert-dismissable">
+                            <a class="panel-close close" data-dismiss="alert">×</a>
+                            {% if user.documents.ya_card_last4 is not None%}
+                            Ваша карта **** {{user.documents.ya_card_last4}}. Вы можете отвязать Вашу карту нажав <strong><a href="{% url 'users:settings_delcard' %}">здесь.</a></strong>
+                            {%else%}
+                            Вы можете привязать банковскую карту к аккаунту <strong><a href="{% url 'payments:index' %}">здесь.</a></strong>
+                            {%endif%}
+                        </div>
+                        <table class="table table-hover table-striped">
+                            <tbody>  
+                                {%for item in payments%}
+                                <tr>
+                                    <td>
+                                       <span class="float-right font-weight-bold">{{item.price}}</span> {{item.date}} {{item.get_payment_type_display}} {{item.get_status_display}}
+                                    </td>
+                                </tr>
+                                {%endfor%}
+                            </tbody> 
+                        </table>
+                    </div>
+                    <div class="tab-pane" id="edit">
+                        <form role="form">
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label">Имя</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="text" value="{{user.first_name}}" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label">Фамилия</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="text" value="{{user.last_name}}" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label">Email</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="email" value="{{user.email}}" readonly>
+                                </div>
+                            </div>
+                            <!--<div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label">Company</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="text" value="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label">Website</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="url" value="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label">Address</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="text" value="" placeholder="Street">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label"></label>
+                                <div class="col-lg-6">
+                                    <input class="form-control" type="text" value="" placeholder="City">
+                                </div>
+                                <div class="col-lg-3">
+                                    <input class="form-control" type="text" value="" placeholder="State">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label">Time Zone</label>
+                                <div class="col-lg-9">
+                                    <select id="user_time_zone" class="form-control" size="0">
+                                        <option value="Hawaii">(GMT-10:00) Hawaii</option>
+                                        <option value="Alaska">(GMT-09:00) Alaska</option>
+                                        <option value="Pacific Time (US &amp; Canada)">(GMT-08:00) Pacific Time (US &amp; Canada)</option>
+                                        <option value="Arizona">(GMT-07:00) Arizona</option>
+                                        <option value="Mountain Time (US &amp; Canada)">(GMT-07:00) Mountain Time (US &amp; Canada)</option>
+                                        <option value="Central Time (US &amp; Canada)" selected="selected">(GMT-06:00) Central Time (US &amp; Canada)</option>
+                                        <option value="Eastern Time (US &amp; Canada)">(GMT-05:00) Eastern Time (US &amp; Canada)</option>
+                                        <option value="Indiana (East)">(GMT-05:00) Indiana (East)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label">Username</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="text" value="janeuser">
+                                </div>
+                            </div>-->
+                            {% for field in form %}
+                            <div class="form-group row">
+                            <label class="col-lg-3 col-form-label form-control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                <div class="col-lg-9">
+                                {% render_field field class="form-control" %}
+                                    {% for error in field.errors %}
+                                        <p class="help-block">{{ error }}</p>
+                                    {% endfor %}
+                         
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <!--<div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label">Password</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="password" value="11111122333">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label">Confirm password</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="password" value="11111122333">
+                                </div>
+                            </div> -->
+
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label"></label>
+                                <div class="col-lg-9">
+                                    <!--<input type="reset" class="btn btn-secondary" value="Cancel">-->
+                                    <input type="submit" class="btn btn-primary" value="Сохранить">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 order-lg-1 text-center">
+                <img src="/media/{{user.documents.image_one}}" height="150" width="150" class="mx-auto img-fluid img-circle d-block" alt="avatar">
+                <h6 class="mt-2">Главная страница паспорта</h6>
+                <img src="/media/{{user.documents.image_two}}" height="150" width="150" class="mx-auto img-fluid img-circle d-block" alt="avatar">
+                <h6 class="mt-2">Страница с пропиской</h6>
+               
+            </div>
+        </div>
+    </div>    
+  </section>
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

@@ -25,16 +25,16 @@
             <ul class="navbar-nav ml-auto">
             {% if user.is_authenticated %}
             <li class="nav-item">
-                <a class="nav-link js-scroll-trigger" href="#">Главная</a>
+                <a class="nav-link js-scroll-trigger" href="{%url 'catalog:map' %}">Главная</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link js-scroll-trigger" href="#">Избранное</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link js-scroll-trigger" href="#">Настройки</a>
+                <a class="nav-link js-scroll-trigger" href="{%url 'users:settings' %}">Настройки</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link js-scroll-trigger" href="#">Выход</a>
+                <a class="nav-link js-scroll-trigger" href="{%url 'logout' %}">Выход</a>
             </li>
             {%else%}
             <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#">Главная</a></li>

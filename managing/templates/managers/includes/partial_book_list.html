@@ -1,0 +1,18 @@
+{% for item in flats %}
+  <tr>
+  
+    <td>{{ item.addressPartOne }} {{ item.addressPartTwo }}</td>
+    <td>{{ item.price }} \ {{ item.deposit }}</td>
+    <td>{{ item.per_hour }}</td>
+
+    <td>{{ item.getStatus }}</td>
+    
+    <td>
+      <a href="{% url 'sharing:flatsEdit' item.id %}" class="btn btn-warning btn-sm">Редактировать</a>
+    </td>
+  </tr>
+{% empty %}
+  <tr>
+    <td colspan="8" class="text-center bg-warning">У вас еще нет квартир</td>
+  </tr>
+{% endfor %}
