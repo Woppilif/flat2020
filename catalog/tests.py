@@ -1,10 +1,16 @@
 from django.test import TestCase
 from catalog.models import Flats
+from booking.models import Booking
 from managing.models import Partners
 from django.contrib.auth.models import User
 import requests
 from catalog.modules import bitx
 from catalog.modules import pagination
+from django.utils import timezone
+from datetime import datetime
+
+from django.utils.timezone import now
+from django.db.models import Q
 # Create your tests here.
 '''
 class FlatsTest(TestCase):
@@ -55,7 +61,35 @@ def pool():
         if flat is not None:
             flat.addImages(i.images)
             flat.addItems(i.items)
+            
+            for x in i.calendar_ev:
+                start = x._begin.replace(hour=14,minute=0)
+                end = x._end_time.replace(hour=12,minute=0)
+
+                start = datetime.strptime(str(start)[:16], '%Y-%m-%dT%H:%M')
+                end = datetime.strptime(str(end)[:16], '%Y-%m-%dT%H:%M')
+            
+                start = timezone.make_aware(start)
+                end = timezone.make_aware(end)
+                r = Booking.objects.update_or_create(
+                    flat = flat,
+                    rentor_id=2,
+                    start=start,
+                    end=end,
+                    paid=True,
+                    status='succeeded'
+
+                )
+                print(r)
+            
 
 pool()
+
 '''
+f =  Flats.objects.all()
+print(len(f))
+b = Booking.objects.filter(~Q(status='canceled'),end__gt=now()).prefetch_related('flat')
+f = f.difference(b)
+print(len(f))
+
 

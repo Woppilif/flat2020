@@ -85,15 +85,12 @@ WSGI_APPLICATION = 'flatsharing.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'flats',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1', 
-        'PORT': '3306',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        }
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'flatsharing',
+        'USER': 'postgres',
+        'PASSWORD': 'blink182',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 

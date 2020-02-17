@@ -51,9 +51,7 @@ class BookingExt(models.Manager):
         '''
         Function returns all flats to map which are not rented yet and booking_ending is not expired
         '''
-        date = now()
-        b = [i.flat.pk for i in self.filter(~Q(status='canceled'),flat__in=flats_queryset)]
-        #,booking_end__gt=date,start__lt=date,paid=False
+        b = [i.flat.pk for i in self.filter(~Q(status='canceled'),end__gt=now())]
         flats_queryset = flats_queryset.exclude(id__in=b)
         return flats_queryset
 
