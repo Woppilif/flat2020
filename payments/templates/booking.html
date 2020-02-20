@@ -1,0 +1,37 @@
+{% extends 'includes/main.html' %}
+{% load static %}
+{% block title %}Оплата аренды{% endblock %}
+
+{% block content %}
+<section class="contr" id="contr"> 
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h1>Оплата аренды</h1>
+                <p>{{booking}}</p>
+            </div>            
+        </div>
+        <div id="payment-form"></div>
+        
+      </div>
+  </section>
+
+{% endblock %}
+
+{% block javascript %}
+
+<script src="https://kassa.yandex.ru/checkout-ui/v2.js"></script>
+<script>
+    //Инициализация виджета. Все параметры обязательные.
+    const checkout = new window.YandexCheckout({
+        confirmation_token: '{{transaction.confirmation.confirmation_token}}', //Токен, который перед проведением оплаты нужно получить от Яндекс.Кассы
+        return_url: "{%url 'payments:capture' transaction.id %}", //Ссылка на страницу завершения оплаты
+        error_callback(error) {
+            //Обработка ошибок инициализации
+        }
+    });
+    
+    //Отображение платежной формы в контейнере
+    checkout.render('payment-form');
+</script>
+{% endblock %}

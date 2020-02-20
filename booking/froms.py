@@ -34,7 +34,9 @@ class RentForm(forms.Form):
 
     def save(self, commit=True):
         print("ok")
-        return Booking.extended.createBooking(self.user,self.current_flat,self.cleaned_data['end'])
+        booking = Booking.extended.createBooking(self.user,self.current_flat,self.cleaned_data['end'])
+        booking.createDeal()
+        return booking
 
     class Meta:
         fields = ('end',)

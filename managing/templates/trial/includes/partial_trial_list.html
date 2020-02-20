@@ -1,0 +1,11 @@
+{% for item in rents %}
+<tr>
+  <td>
+   <a href="{% url 'managing:booking' item.pk %}">{{item}}</a> 
+  </td> 
+</tr>
+{% empty %}
+<tr>
+  <td colspan="3" class="text-center bg-warning">-</td>
+</tr>
+{% endfor %}

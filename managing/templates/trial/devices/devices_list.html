@@ -1,0 +1,12 @@
+{% for item in devices %}
+<tr>
+  <td>{{item.flat}}</td>
+  <td>{{item.status}}</td>
+</tr>
+
+{% empty %}
+<tr>
+  <td colspan="2" class="text-center bg-warning">У вас еще нет квартир</td>
+</tr>
+{% endfor %}
+

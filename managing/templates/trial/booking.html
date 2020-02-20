@@ -1,0 +1,70 @@
+{% extends 'managing/includes/header.html' %}
+
+{% load static %}
+{% block javascript %}
+<script src="{% static 'managing/js/managers.js' %}"></script>
+{% endblock %}
+{% block content %}
+
+<section class="contr" id="contr">   
+    <div class="container">
+        <ul class="list-group mb-3">
+            <li class="list-group-item d-flex justify-content-between lh-condensed">
+              <div>
+                <h6 class="my-0">Квартира</h6>
+                <span class="text-muted">{{booking.flat}}</span>
+              </div>
+              <span class="text-muted">{{booking.start}} - {{booking.end}}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between lh-condensed">
+              <div>
+                <h6 class="my-0">Статус аренды</h6>
+                <span class="text-muted">{{booking.get_status_display}}</span>
+              </div>
+              <span class="text-muted">Стоимость: {{booking.getPrice}}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between lh-condensed">
+              <div>
+                <h6 class="my-0">Арендатор</h6>
+                <span class="text-muted">{{booking.rentor}}</span>
+              </div>
+              <span class="text-muted"></span>
+            </li>
+            {% if booking.trial_key != None %}
+            <li class="list-group-item d-flex justify-content-between lh-condensed">
+            <div>
+                <h6 class="my-0">Ссылка для пользователя</h6>
+                <span class="text-muted">
+                    <input type="text" value="http://127.0.0.1:8001{{ booking.get_absolute_url }}" id="renta_{{booking.pk}}">
+                </span>
+            </div>
+            <span class="text-muted"><button onclick="myFunction('{{booking.pk}}')">Копировать</button></span>
+            </li>
+            {%endif%}
+            <!--<li class="list-group-item d-flex justify-content-between bg-light">
+              <div class="text-success">
+                <h6 class="my-0">Promo code</h6>
+                <span>EXAMPLECODE</span>
+              </div>
+              <span class="text-success">-$5</span>
+            </li>-->
+            {% for item in transactions %}
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Транзакция: {{item.date}} {{item.get_payment_type_display}} {{item.get_status_display}}</span>
+              <strong>{{item.price}}</strong>
+            </li>
+            {%endfor%}
+          </ul>
+    </div>
+</section>
+<script>
+function myFunction(id) {
+    var copyText = document.getElementById("renta_"+id);
+    copyText.select();
+    copyText.setSelectionRange(0, 99999)
+    document.execCommand("copy");
+    alert("Скопировано!");
+}
+</script>
+
+{% endblock %}

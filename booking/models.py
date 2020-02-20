@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from datetime import timedelta
 from django.utils.timezone import now
 from django.db.models import Q
+import requests
 # Create your models here.
 
 class BookingExt(models.Manager):
@@ -71,17 +72,27 @@ class Booking(models.Model):
     paid = models.BooleanField(null=True,default=False)
     created_at = models.DateTimeField(null=True,blank=True,default=None)
     trial_key = models.CharField(max_length=80, blank=True, null=True,default=None)
-
+    deal_id = models.IntegerField(verbose_name="ID сделки в битрикс",blank=True, null=True,default=0)
     extended = BookingExt()
     objects = models.Manager()
     
     def __str__(self):
         return "{0} {1} {2}".format(self.flat,str(self.start),str(self.end))
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('booking:trial', args=[self.trial_key])
+
     class Meta:
         verbose_name = 'Аренда'
         verbose_name_plural = 'Аренды'
         ordering = ['-start']
+
+
+    def save(self, *args, **kwargs):
+        print(self)
+        super(Booking, self).save(*args, **kwargs)
+        print(self)
 
     def timeIsUp(self):
         '''
@@ -153,12 +164,12 @@ class Booking(models.Model):
             return 2
         return 0
 
-    def setDates(self):
+    def setDates(self,add=0):
         '''
         Set Start to 14h.0m and end to 12h.0m
         '''
-        self.start = self.start.replace(hour=11,minute=0,second=0)
-        self.end = self.end.replace(hour=9,minute=0,second=0)
+        self.start = self.start.replace(hour=11+add,minute=0,second=0)
+        self.end = self.end.replace(hour=9+add,minute=0,second=0)
         self.save()
         return self
 
@@ -173,3 +184,33 @@ class Booking(models.Model):
 
     def getDeposit(self):
         return self.flat.deposit
+
+    def createDeal(self):
+        payload = {
+            'id':self.flat.bxcal_id,
+            'begin_date':self.start,
+            'end_date':self.end,
+            'status':1,
+            'notes':"FlatSharing",
+            'amount':self.getPrice(),
+            'prepayment':self.getPrice(),
+            'deposit':self.getPrice(),
+            'fio': self.rentor.get_full_name(),
+            'phone': self.rentor.documents.phone_number,
+            'email': self.rentor.email
+        }
+        page = requests.get("https://www.laps.r73.ru/dum/flat/crdeal.php",params=payload)
+        print("deal")
+        if page.status_code == 200:
+            print("deal 200")
+            self.deal_id = int(page.text)
+            self.save()
+        return self
+
+    def cancelDeal(self):
+        page = requests.get("https://www.laps.r73.ru/dum/flat/cancel.php",params={'id':self.deal_id})
+        print("deal cancel")
+        if page.status_code == 200:
+            print("deal cancel 200")
+            return True
+        return False

@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'widget_tweaks'
+    'widget_tweaks',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -145,3 +146,13 @@ CELERY_TIMEZONE = 'Europe/Moscow'
 
 YA_ACCOUNT_ID = 591310
 YA_SECRET_KEY = "test_1J9BQa-AGyxrN3U9x7CrJ6l4bM0ri8L5a5aGcBj7T_w"
+
+ASGI_APPLICATION = 'routing.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}

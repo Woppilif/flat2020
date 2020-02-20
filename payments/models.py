@@ -11,14 +11,10 @@ Configuration.secret_key = settings.YA_SECRET_KEY
 
 class YandexPayments(models.Manager):
 
-    def getCurrentTransaction(self,user,amount,booking=None,payment_type=False):
-        if payment_type is True:
-            pt = 'full'
-        elif payment_type is False:
-            pt = 'account'
-        return self.filter(Q(status="pending") | Q(status="waiting_for_capture"),user=user,checkouted=False,price=amount,booking=booking,payment_type = pt).last()
+    def getCurrentTransaction(self,user,amount,booking=None,payment_type="account"):
+        return self.filter(Q(status="pending") | Q(status="waiting_for_capture"),user=user,checkouted=False,price=amount,booking=booking,payment_type = payment_type).last()
 
-    def createPayment(self,user,amount,booking=None,payment_type=False):
+    def createPayment(self,user,amount,booking=None,payment_type="account"):
         '''
             Create yandex kassa payment object. payment_type = True - autopayment otherwise is add card
         '''
@@ -33,11 +29,9 @@ class YandexPayments(models.Manager):
             "description": "Привязка карты"
         }
         payment_info.update(self.createReceipt(user,amount))
-        if payment_type is True:
-            pt = 'full'
+        if payment_type == "full":
             payment_info.update(self.createAutoPayment(user))
-        elif payment_type is False:
-            pt = 'account'
+        else: #payment_type == "account": # False
             payment_info.update(self.createConfirmation())
         payment_object = Payment.create(payment_info)
         self.create(
@@ -46,7 +40,7 @@ class YandexPayments(models.Manager):
             price = amount,
             date = now(),
             status = payment_object.status,
-            payment_type = pt,
+            payment_type = payment_type,
             payment_id = payment_object.id,
             created_at = payment_object.created_at,
             expires_at = payment_object.expires_at,
@@ -97,7 +91,8 @@ class Transactions(models.Model):
         ('account', 'Привязка карты'),
         ('deposit', 'Депозит'),
         ('full', 'Полная стоимость'),
-        ('usercard', 'Оплата картой клиента')
+        ('usercard', 'Оплата картой клиента'),
+        ('trial', 'Оплата аренды без регистрации')
     )
     PAID_TYPES = (
         ('pending', 'Создан'), # Статус сразу после создания аренды

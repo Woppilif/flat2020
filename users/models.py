@@ -11,6 +11,7 @@ def get_file_path_users(instance, filename):
 
 class Documents(models.Model):
     STATUS_TYPES = (
+        (None, 'Создан'),
         (False, 'Не подтвержден'),
         (True, 'Подтверждён')
     )
@@ -20,7 +21,7 @@ class Documents(models.Model):
     phone_number = models.CharField(max_length=50,default="", blank=False, null=False,verbose_name="Телефонный номер")
     image_one = models.ImageField(upload_to=get_file_path_users,default=None,verbose_name="Фотография первой страницы паспорта", blank=True, null=True)
     image_two = models.ImageField(upload_to=get_file_path_users,default=None,verbose_name="Фотография страницы с пропиской", blank=True, null=True)
-    status = models.BooleanField(null=False,default=False,choices=STATUS_TYPES)
+    status = models.BooleanField(null=True,blank=False,default=None,choices=STATUS_TYPES)
     yakey = models.CharField(max_length=50,default=None, blank=True, null=True)
     ya_card_type = models.CharField(max_length=50,default=None, blank=True, null=True)
     ya_card_last4 = models.CharField(max_length=4,default=None, blank=True, null=True)

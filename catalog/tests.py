@@ -7,7 +7,7 @@ import requests
 from catalog.modules import bitx
 from catalog.modules import pagination
 from django.utils import timezone
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.utils.timezone import now
 from django.db.models import Q
@@ -40,6 +40,7 @@ class FlatsTest(TestCase):
         for i in flats:
             print(i.getItems())
 
+'''
 
 def pool():
     flats = bitx.Soap().getAll()
@@ -84,12 +85,4 @@ def pool():
             
 
 pool()
-
-'''
-f =  Flats.objects.all()
-print(len(f))
-b = Booking.objects.filter(~Q(status='canceled'),end__gt=now()).prefetch_related('flat')
-f = f.difference(b)
-print(len(f))
-
 

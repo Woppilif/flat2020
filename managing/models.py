@@ -57,3 +57,8 @@ class Devices(models.Model):
     class Meta:
         verbose_name = 'Устройство'
         verbose_name_plural = 'Устройства'
+
+    def setStatus(self,status):
+        self.status = status
+        self.save()
+        return self
