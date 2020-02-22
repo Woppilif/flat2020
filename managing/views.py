@@ -15,6 +15,7 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from managing import consumers
 import json
+from managing.modules import bot
 # Create your views here.
 
 def checkRoleManager(function):
@@ -133,3 +134,11 @@ def sendMessageToAllAPI(flat_id,message = "hello"):
         'message': json.dumps(message)
     })
     return True
+
+def telegram(request,token):
+    if request.method == 'POST':
+        json_data = json.loads(request.body)
+        bot.telegram_webhook(json_data)
+    else:
+        bot.setWebhook()
+    return HttpResponse(status=200)

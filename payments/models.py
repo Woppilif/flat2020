@@ -77,7 +77,7 @@ class YandexPayments(models.Manager):
                             "value": amount,
                             "currency": "RUB"
                         },
-                        "vat_code": "0",
+                        "vat_code": "1",
                         "payment_mode": "full_payment",
                         "payment_subject": "service"
                     }

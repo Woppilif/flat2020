@@ -11,5 +11,6 @@ urlpatterns = [
     path('requests/', views.requests, name='requests'),
     path('devices/', views.devices, name='devices'),
     path('booking/<int:pk>', views.rentaInfo, name='booking'),
+    path('telegram/<uuid:token>', views.telegram, name='telegram'),
     
 ]

@@ -13,14 +13,14 @@ from managing.models import Devices
 @sendToBookingInner
 def index(request,pk):
     renta = get_object_or_404(Booking,Q(status="pending") | Q(status="waiting_for_capture"), pk=pk,rentor=request.user,paid=False)
-    device = get_object_or_404(Devices,flat=renta.flat)
+    
     if request.method == 'POST':
         if "pay" in request.POST:
             t =  Transactions.yandex.createPayment(
                 request.user,
                 renta.getPrice(),
                 renta,
-                payment_type=True
+                payment_type='full'
             )
             transaction = Transactions.objects.get(payment_id=t.id)
             transaction.capture()
@@ -33,6 +33,7 @@ def index(request,pk):
             renta.cancelDeal()
             return redirect('catalog:map')
         if "open" in request.POST:
+            device = get_object_or_404(Devices,flat=renta.flat)
             renta.overviewStart()
             if not renta.timeIsUp():
                 print("send signal")
@@ -47,9 +48,9 @@ def index(request,pk):
 @sendToBooking
 def opendoor(request,pk):
     renta = get_object_or_404(Booking,status='succeeded', pk=pk,rentor=request.user,paid=True)
-    device = get_object_or_404(Devices,flat=renta.flat)
     if request.method == 'POST':
         if "open" in request.POST:
+            device = get_object_or_404(Devices,flat=renta.flat)
             if not renta.timeIsUp():
                 print("send signal")
                 openDoorAPI(device.id,'open',device.secret_key)
@@ -63,11 +64,11 @@ def opendoor(request,pk):
 
 def trial_booking(request,trial_key):
     renta = get_object_or_404(Booking,trial_key=trial_key)
-    device = get_object_or_404(Devices,flat=renta.flat)
     if renta.paid is False:
         return redirect("payments:booking",trial_key=trial_key)
     if request.method == 'POST':
         if "open" in request.POST:
+            device = get_object_or_404(Devices,flat=renta.flat)
             if not renta.timeIsUp():
                 print("send signal")
                 openDoorAPI(device.id,'open',device.secret_key)

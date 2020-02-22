@@ -62,3 +62,11 @@ class Devices(models.Model):
         self.status = status
         self.save()
         return self
+
+class SystemLogs(models.Model):
+    device = models.ForeignKey(Devices, models.DO_NOTHING,blank=True, null=True)
+    created_at = models.DateTimeField(null=True,blank=True,auto_created=True)
+    comment = models.CharField(max_length=50, blank=True, null=True)
+
+    def __str__(self):
+        return "{0} - {1}".format(self.comment,self.created_at)

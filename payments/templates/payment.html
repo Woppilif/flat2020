@@ -25,7 +25,7 @@
     //Инициализация виджета. Все параметры обязательные.
     const checkout = new window.YandexCheckout({
         confirmation_token: '{{transaction.confirmation.confirmation_token}}', //Токен, который перед проведением оплаты нужно получить от Яндекс.Кассы
-        return_url: "{%url 'payments:capture' transaction.id %}", //Ссылка на страницу завершения оплаты
+        return_url: "https://ewtm.ru{%url 'payments:capture' transaction.id %}", //Ссылка на страницу завершения оплаты
         error_callback(error) {
             //Обработка ошибок инициализации
         }

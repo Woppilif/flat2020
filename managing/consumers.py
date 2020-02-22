@@ -2,7 +2,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 from django.utils import timezone
 from datetime import datetime
-from managing.models import Devices
+from managing.models import Devices, SystemLogs
 from channels.db import database_sync_to_async
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -45,7 +45,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def addLog(self,id,comment):
-        #SystemLogs.objects.create(device_id=int(id),created_at=timezone.now(),comment=comment)
+        SystemLogs.objects.create(device_id=int(id),created_at=timezone.now(),comment=comment)
         return True
 
     # Receive message from WebSocket
