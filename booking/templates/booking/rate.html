@@ -1,0 +1,43 @@
+{% extends 'includes/main.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block title %}Оценка квартиры{% endblock %}
+
+{% block content %}
+<section class="contr" id="contr">
+    <div class="container">
+        <h3>Благодарим Вас за использование нашего сервиса!</h3>
+        <p>Пожалуйста, оцените качество квартиры</p>
+        <form method="post" action="{% url 'booking:rate' booking.pk %}">
+                {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group{% if field.errors %} has-error{% endif %}">
+            <label for="{{ field.id_for_label }}">{{field.label}}</label>
+            <div class="input-group mb-3">
+                {% render_field field %}
+            </div>
+            {% for error in field.errors %}
+                <p class="help-block">{{ error }}</p>
+            {% endfor %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Создать</button>
+        </form>
+    </div>
+</section>
+
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+    function updateCleanness()
+    {
+        $("label[for*='id_cleanness']").text("Чистота помещения "+$("#id_cleanness").val()+" из "+$("#id_cleanness").attr("max"));
+    }
+    function updateStaff()
+    {
+        $("label[for*='id_staff']").text("Оценка работы персонала "+$("#id_staff").val()+" из "+$("#id_staff").attr("max"));
+    }
+</script>
+{% endblock %}

@@ -51,6 +51,7 @@ def pool():
         )
         flat.address = i.location['address']
         flat.flat = i.location['flat_number']
+        flat.city = i.location['city']
         flat.metro_station = i.location['metro']
         flat.price = i.price
         flat.floor = i.floor
@@ -58,6 +59,7 @@ def pool():
         flat.latitude = i.location['latitude']
         flat.longitude = i.location['longitude']
         flat.description = i.description
+        flat.status = True
         flat.save()
         if flat is not None:
             flat.addImages(i.images)

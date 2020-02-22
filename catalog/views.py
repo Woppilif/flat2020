@@ -34,7 +34,8 @@ def apartment(request,pk=None):
     flat = get_object_or_404(Flats, pk=pk)
     untill = Booking.extended.getDaysBeforeRenta(flat)
     if request.method == 'POST':
-        print("here")
+        if request.user.documents.yakey == "" or request.user.documents.yakey is None:
+            return redirect("payments:index")
         form = RentForm(data=request.POST, current_flat=flat, user=request.user)
         if form.is_valid():
             renta = form.save()

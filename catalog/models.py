@@ -18,7 +18,7 @@ class Flats(models.Model):
     latitude = models.FloatField(blank=True, null=True,default=0)
     longitude = models.FloatField(blank=True, null=True,default=0)
     description = models.TextField(blank=True, null=True)
-    hint = models.CharField(max_length=50, blank=True, null=True)
+    hint = models.CharField(max_length=50, blank=True, null=True,default="")
     cleaning_time = models.TimeField(blank=True, null=True,default="2:00")
     metro_station = models.CharField(max_length=60, blank=True, null=True)
     bxcal_id = models.IntegerField(blank=True, null=True,default=None)
@@ -72,4 +72,3 @@ class Images(models.Model):
     class Meta:
         verbose_name = 'Изображение'
         verbose_name_plural = 'Изображения'
-

@@ -18,6 +18,7 @@ def index(request):
 
 #@login_required(login_url='/accounts/login/')
 def capture(request,id):
+    print(id)
     transaction = get_object_or_404(Transactions,checkouted = False, payment_id = id)
     transaction.setInfo(transaction.getInfo())
     print(transaction.status)

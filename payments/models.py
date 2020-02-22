@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.utils.timezone import now
 from yandex_checkout import Payment,Configuration 
 from django.conf import settings
+import decimal
 # Create your models here.
 Configuration.account_id = settings.YA_ACCOUNT_ID
 Configuration.secret_key = settings.YA_SECRET_KEY
@@ -23,7 +24,7 @@ class YandexPayments(models.Manager):
             return self.getCurrentTransaction(user,amount,booking,payment_type).getInfo()
         payment_info = {
             "amount": {
-                "value": amount,
+                "value": str(decimal.Decimal(amount)),
                 "currency": "RUB"
             },
             "description": "Привязка карты"
@@ -74,7 +75,7 @@ class YandexPayments(models.Manager):
                         "description": "Оплата аренды",
                         "quantity": "1.00",
                         "amount": {
-                            "value": amount,
+                            "value": str(decimal.Decimal(amount)),
                             "currency": "RUB"
                         },
                         "vat_code": "1",

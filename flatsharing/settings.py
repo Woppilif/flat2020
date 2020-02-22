@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '^!+7qn+n5d^1%b3z)uiosvr)mh*h*8s+#p%d+2!#*mnjb3&$-x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'flatsharing.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'flatsharing',
+        'NAME': 'flatsh',
         'USER': 'postgres',
         'PASSWORD': 'blink182',
         'HOST': 'localhost',
@@ -144,13 +144,13 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Moscow'
 
-'''
+
 YA_ACCOUNT_ID = 591310
 YA_SECRET_KEY = "test_1J9BQa-AGyxrN3U9x7CrJ6l4bM0ri8L5a5aGcBj7T_w"
 '''
 YA_ACCOUNT_ID = 589826
 YA_SECRET_KEY = "live_ZZHrJzT8Iq7u1YoBdDY01jN-OTMusTmmWASnrBYdqi8"
-
+'''
 ASGI_APPLICATION = 'routing.application'
 CHANNEL_LAYERS = {
     'default': {

@@ -7,61 +7,50 @@
   
 </header>
 
-<section id="filler" style="position:relative; padding-top:20px;">
-  <div class="container" style="padding-top:25px;">
-      <div class="row">
-        <div class="col-lg-8 mx-auto">
-          <h2>{{renta.flat.addressPartOne}}</h2>
-          <p class="lead">{{renta.flat.hint}} </p>
-          {% if renta.flat.app_status is False%}
-            <p  class="lead" style="color: red;">Внимание! Связь электронного замка и нашего сервера была потеряна. Если прошло более 2 минут с момента появления этого сообщения, обратитесь к менеджеру.</p>
-          {%endif%}
-        </div>
-      </div>
-    </div> 
-  <form method='POST' action="#">
-    {% csrf_token %}
-      <!--<div class="container">
-          <div class="row">
-              <div class="col-lg-4 mx-auto">
-                  <div class="form-group">
-                    <label for="id_end">Количество дней <strong id="daysCount">1</strong></label>
-                    <input type="range" class="custom-range" min="1" max="5" step="1" value="1" name="end" id="id_end" onchange="changeval()">
-                  </div>
-              <div class="form-group">
-                  <button type="submit" class="btn btn-lg btn-block btn-outline-secondary" name="extend">Продлить</button>
-              </div>
-              
-              </div>
-          </div>
-      </div> -->
-      <div class="container">
-          <div class="row">
-              <div class="col-lg-4 mx-auto">
-              <div class="form-group">
-                  <button type="submit" class="btn btn-lg btn-block btn-outline-danger" name="end">Завершить аренду</button>
-              </div>
-              
-              </div>
-          </div>
-      </div>
- 
-  
-</section> 
-
 <footer class="py-1 bg-dark fixed-bottom">
- 
+    
       <div class="container">
           <div class="row">
+            
               <div class="col-md-8">
+                <form method='POST' action="#">
+                    {% csrf_token %}
                   <button type="submit" class="btn btn-lg btn-block btn-primary" name="open">Открыть дверь | {{renta.getRemainingBookingTime}}</button>
+                </form>
               </div>
+            
               <div class="col-md-4 padd">
-                <button class="btn btn-lg btn-block btn-secondary">Информация</button>
+                <button class="btn btn-lg btn-block btn-secondary" data-toggle="modal" data-target="#infoModal">Информация</button>
             </div>
           </div>
       </div>
-  </form>
+  
+
+  <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="false" data-backdrop="false">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="infoModalLabel">Информация об аренде</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <h2>{{renta.flat}}</h2>
+            <p class="lead">{{renta.flat.hint}} </p>
+            <p class="lead">Начало: {{renta.start}}</p>
+            <p class="lead">Окончание: {{renta.end}}</p>
+            {% if device.status is False%}
+              <p  class="lead" style="color: red;">Внимание! Связь электронного замка и нашего сервера была потеряна. Если прошло более 2 минут с момента появления этого сообщения, обратитесь к менеджеру.</p>
+            {%endif%}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+          <!--<button type="button" class="btn btn-primary">Save changes</button>-->
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block javascript %}

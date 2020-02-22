@@ -52,7 +52,7 @@ class BookingExt(models.Manager):
         '''
         Function returns all flats to map which are not rented yet and booking_ending is not expired
         '''
-        b = [i.flat.pk for i in self.filter(~Q(status='canceled'),end__gt=now())]
+        b = [i.flat.pk for i in self.filter(~(Q(status='canceled')|Q(status='ended')),end__gt=now())]
         flats_queryset = flats_queryset.exclude(id__in=b)
         return flats_queryset
 
@@ -61,7 +61,8 @@ class Booking(models.Model):
         ('pending', 'Создана'), # Статус сразу после создания аренды
         ('waiting_for_capture', 'Ожидает подтверждения от пользователя'), #Был начат осмотр кв
         ('succeeded', 'Подтверждена \ активна'), # Успешно оплачена
-        ('canceled', 'Отменена') # отказ клиентом от аренды
+        ('canceled', 'Отменена'), # отказ клиентом от аренды
+        ('ended','Завершена')
     )
     flat = models.ForeignKey('catalog.Flats', on_delete=models.CASCADE,related_name="Квартира",related_query_name="Квартира")
     rentor = models.ForeignKey(User, models.DO_NOTHING)
@@ -88,11 +89,10 @@ class Booking(models.Model):
         verbose_name_plural = 'Аренды'
         ordering = ['-start']
 
-
+    '''
     def save(self, *args, **kwargs):
-        print(self)
         super(Booking, self).save(*args, **kwargs)
-        print(self)
+    '''
 
     def timeIsUp(self):
         '''
@@ -105,6 +105,12 @@ class Booking(models.Model):
             if now() > self.end:
                 return True
         return False
+
+    def endRenta(self):
+        if self.status == 'succeeded':
+            self.status = 'ended'
+            self.save()
+        return self
 
     def cancel(self):
         if self.status != 'succeeded':
@@ -200,17 +206,23 @@ class Booking(models.Model):
             'email': self.rentor.email
         }
         page = requests.get("https://www.laps.r73.ru/dum/flat/crdeal.php",params=payload)
-        print("deal")
         if page.status_code == 200:
-            print("deal 200")
             self.deal_id = int(page.text)
             self.save()
         return self
 
     def cancelDeal(self):
         page = requests.get("https://www.laps.r73.ru/dum/flat/cancel.php",params={'id':self.deal_id})
-        print("deal cancel")
         if page.status_code == 200:
-            print("deal cancel 200")
             return True
         return False
+
+
+class BookingRate(models.Model):
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
+    cleanness = models.IntegerField(blank=True,null=True,default=0,verbose_name="Чистота")
+    staff = models.IntegerField(blank=True,null=True,default=0,verbose_name="Оценка работы персонала")
+    rated = models.BooleanField(default=False,blank=True, null=True)
+    class Meta:
+        verbose_name = 'Рейтинг заселения'
+        verbose_name_plural = 'Рейтинг заселений'

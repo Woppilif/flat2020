@@ -5,7 +5,7 @@ app_name = 'payments'
 
 urlpatterns = [
     path('payment/', views.index, name='index'),
-    path('payment/<str:id>', views.capture, name='capture'),
+    path('payment/<uuid:id>', views.capture, name='capture'),
     path('booking/<uuid:trial_key>', views.booking_pay, name='booking'),
     #path('error/', views.error, name='error'),
 ]
