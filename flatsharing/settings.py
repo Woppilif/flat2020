@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'flatsharing.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'flatsh',
+        'NAME': 'flatsharing',
         'USER': 'postgres',
         'PASSWORD': 'blink182',
         'HOST': 'localhost',

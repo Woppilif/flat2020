@@ -63,9 +63,6 @@ def opendoor(request,pk):
             else:
                 print("time is up do smth")
             return redirect('booking:opendoor',pk=renta.pk)
-        if "end" in request.POST:
-            renta.deactivate()
-            return redirect('catalog:map')
     return render(request, 'booking/opendoor.html', {"renta":renta,"device":device})
 
 def trial_booking(request,trial_key):
@@ -84,9 +81,6 @@ def trial_booking(request,trial_key):
             else:
                 print("time is up do smth")
             return redirect('booking:trial',trial_key=trial_key)
-        if "end" in request.POST:
-            renta.deactivate()
-            return redirect('catalog:map')
     return render(request, 'booking/opendoor.html', {"renta":renta,"device":device})
 
 def rate(request,pk):
@@ -94,15 +88,14 @@ def rate(request,pk):
     try:
         rentaRaiting = BookingRate.objects.get(booking=renta)
     except:
-        rentaRaiting = BookingRate.objects.create(booking=renta)
+        rentaRaiting = BookingRate.objects.create(booking=renta,cleanness=8,staff=7)
     if request.method == 'POST':
         form = BookingRateForm(data=request.POST,instance=rentaRaiting)
         if form.is_valid():
             rate = form.save(commit=False)
-            #rate.booking = renta
             rate.rated = True
             rate.save()
-            renta.deactivate()
+            renta.endRenta()
         return redirect('catalog:map')
     form = BookingRateForm(instance=rentaRaiting)
     return render(request, 'booking/rate.html', {"form":form,"booking":renta})
