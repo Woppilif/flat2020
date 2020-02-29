@@ -11,6 +11,11 @@
   padding: 300px 0 100px;
 }
 
+.indexheader {
+  height: 35vh;
+  padding: 500px 0 100px;
+}
+
 header {
   height: 100vh;
   padding: 500px 0 100px;
@@ -65,4 +70,38 @@ section {
 #contrpadd
 {
   padding-top: 60px;
+}
+
+.scrolling-wrapper {
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+
+  .card {
+    display: inline-block;
+  }
+}
+
+.scrolling-wrapper-flexbox {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+
+  .card {
+    flex: 0 0 auto;
+  }
+}
+
+.scrolling-wrapper {
+  -webkit-overflow-scrolling: touch;
+}
+
+.scrolling-wrapper, .scrolling-wrapper-flexbox {
+  height: 80px;
+  margin-bottom: 20px;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }

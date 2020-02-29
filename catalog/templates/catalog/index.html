@@ -1,15 +1,34 @@
 {% extends 'includes/main.html' %}
 {% load static %}
+{% load l10n %}
 {% block title %}Главная{% endblock %}
 
 {% block content %}
-<header class="bg-primary text-white" id="hhddrr">
-    <div class="container text-center">
-      <h1>FlatSharing</h1>
-      <p class="lead">Сервис посуточной аренды квартир</p>
-      <a href="{% url 'login' %}" class="btn btn-success btn-lg btn-block">Вход и регистрация</a>
+  <header class="bg-while text-white indexheader"  id="map"></header>
+  <div class="gallery">
+    <div class="text-center">
+      <h2>Свободные квартиры</h2>
     </div>
-  </header>
+    <div class="container">
+      <div class="row">
+        {% for flat in flats %}
+        <div class="col-md-4">
+          <div class="card" style="width: 18rem;">
+            <img src="{{flat.getPreview.img_url}}" width="250" height="200" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">{{flat.city}} {{flat.address}}</h5>
+              <p class="card-text">{{flat.description| safe |slice:":255"}}...</p>
+              <a href="{% url 'catalog:apartment' flat.pk %}" class="btn btn-primary">{{flat.price}} руб/сутки</a>
+            </div>
+          </div>
+        </div>
+        {%endfor%}
+
+      </div>
+    </div>
+
+
+  </div>
   <footer class="py-1 bg-dark fixed-bottom">
     <div class="container">
       <p class="m-0 text-center text-white">Architecton &copy; 2020</p>
@@ -19,4 +38,112 @@
 {% endblock %}
 
 {% block javascript %}
+<script src="https://maps.api.2gis.ru/2.0/loader.js?pkg=full"></script>
+<script>
+
+    $(document).ready(function(){ 
+      if(window.location.href.split('?').length == 2)
+      showAsList.href = "{% url 'catalog:list' %}?"+window.location.href.split('?')[1];
+    })
+
+
+    var map, markers, ddt;
+
+
+    
+    DG.then(function() {
+        
+
+        var container = document.createElement('div'),
+                    mapBlock = document.getElementById('map'),
+                    markers = DG.featureGroup();
+
+        container.id = 'map';
+
+
+        mapBlock.appendChild(container);
+
+        map = DG.map('map', {
+            center: [55.752114, 37.62017],
+            zoom: 10,
+            fullscreenControl: false,
+            zoomControl: false,
+            width:"100%"
+        });
+
+        {%for flat in flats%}
+            {% if flat.latitude is not None and flat.longitude is not None%}
+            DG.marker([{{flat.latitude|unlocalize}}, {{flat.longitude|unlocalize}}]).addTo(markers).bindLabel('{{flat.address}}').on('click', function () {
+                window.location.replace("{% url 'catalog:apartment' flat.pk %}");
+            });
+            {%endif%}
+        {%endfor%}
+
+
+        markers.addTo(map);
+        
+        map.locate({setView: true, watch: false})
+            .on('locationfound', function(e) {
+                DG.marker([e.latitude, e.longitude]).addTo(map).bindPopup('Вы находитесь здесь!');
+            })
+            .on('locationerror', function(e) {
+                DG.popup()
+                    .setLatLng(map.getCenter())
+                    .setContent('Доступ к определению местоположения отключён')
+                    .openOn(map);
+            });
+
+        document.getElementById('ex2').onchange = showMarkers;
+        document.getElementById('start_date').onchange = showMarkers;
+        document.getElementById('end_date').onchange = showMarkers;
+        document.getElementById('rooms').onchange = showMarkers;
+        //document.getElementById('radius').onchange = showMarkers;
+
+
+        function showMarkers() {
+          markers.removeFrom(map);
+          markers = DG.featureGroup();
+          var promise = DG.ajax('/map/', {
+            type: 'get',
+            data: {
+                min: parseInt(ex2.value.split(',')[0]),
+                max: parseInt(ex2.value.split(',')[1]),
+                start: start_date.value.substr(0,10),
+                end: end_date.value.substr(0,10),
+                rooms: rooms.value,
+                api:true
+            },
+            success: function(data) {
+                data.flats.forEach(element => {
+                  console.log('success', element);
+                  DG.marker([element[1], element[2]]).addTo(markers).on('click', function () {
+                    window.location.replace("/apartment/"+element[0]+" ");
+                });
+                  
+                  
+                });
+                console.log('success', data.flats);
+                ddt = data.flats;
+            },
+            error: function(error) {
+                console.log('error', error);
+            }
+          });
+          markers.addTo(map);
+
+          showAsList.href = "{% url 'catalog:list' %}?min="+parseInt(ex2.value.split(',')[0])+"&max="+parseInt(ex2.value.split(',')[1])+"&start="+start_date.value.substr(0,10)+"&end="+end_date.value.substr(0,10)+"&rooms="+rooms.value+""
+
+        };
+    });
+
+    $("#ex2").slider({});
+    $("#ex2").on("load", function(){
+      $("#ex6SliderVal").text("от "+slideEvt.value[0]+" до "+slideEvt.value[1]);
+      $("#ex6SliderVal").val(slideEvt.value);
+    });
+ $("#ex2").on("slide", function(slideEvt) {
+  $("#ex6SliderVal").text("от "+slideEvt.value[0]+" до "+slideEvt.value[1]);
+  $("#ex6SliderVal").val(slideEvt.value);
+});
+</script>
 {% endblock %}

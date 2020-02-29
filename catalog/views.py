@@ -10,7 +10,7 @@ from users.views import sendToBooking, sendToBookingInner, checkcard, checkDocum
 @checkDocuments
 @sendToBooking
 @sendToBookingInner
-def index(request):
+def map(request):
     flats = Flats.objects.filter(status=True)
     flats = Booking.extended.getAll(flats)
     return render(request, 'catalog/map.html', {"flats":flats})
@@ -25,15 +25,19 @@ def clist(request,offset=1):
     pages = pagination.Pagination(offset,flats,count=5)
     flats = pages.getPaginated()
     return render(request, 'catalog/list.html', {"flats":flats,"pages":pages})
-
+'''
 @login_required(login_url='/accounts/login/')
 @checkDocuments
 @sendToBooking
 @sendToBookingInner
+'''
 def apartment(request,pk=None):
     flat = get_object_or_404(Flats, pk=pk)
     untill = Booking.extended.getDaysBeforeRenta(flat)
+    
     if request.method == 'POST':
+        if request.user.is_authenticated is False:
+            return redirect('login')
         if request.user.documents.yakey == "" or request.user.documents.yakey is None:
             return redirect("payments:index")
         form = RentForm(data=request.POST, current_flat=flat, user=request.user)
@@ -43,3 +47,14 @@ def apartment(request,pk=None):
         else:
             return render(request, 'catalog/apartment.html', {"flat":flat,"untill":untill})
     return render(request, 'catalog/apartment.html', {"flat":flat,"untill":untill})
+
+def index(request):
+    flats = Flats.objects.filter(status=True)
+    flats = Booking.extended.getAll(flats)
+    return render(request, 'catalog/index.html', {"flats":flats})
+
+def user_agreement(request):
+    return render(request, 'catalog/user_agreement.html',{})
+
+def agreement(request):
+    return render(request, 'catalog/agreement.html',{})
