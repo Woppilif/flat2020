@@ -6,40 +6,40 @@ from managing.views import openDoorAPI
 def deletelog(modeladmin, request, queryset):
     #queryset.update(status='p')
     for i in queryset:
-        openDoorAPI(i.id,"deletelog",i.secret_key)
+        openDoorAPI(i.channel_name,"deletelog",i.secret_key)
 
 deletelog.short_description = "Clear log"
 
 def open_door(modeladmin, request, queryset):
     #queryset.update(status='p')
     for i in queryset:
-        openDoorAPI(i.id,"open",i.secret_key)
+        openDoorAPI(i.channel_name,"open",i.secret_key)
 
 open_door.short_description = "Open door"
 
 def update_softare_new(modeladmin, request, queryset):
     #queryset.update(status='p')
     for i in queryset:
-        openDoorAPI(i.id,"updatenew",i.secret_key)
+        openDoorAPI(i.channel_name,"updatenew",i.secret_key)
 update_softare_new.short_description = "Update software [NEW]"
 
 def update_softare(modeladmin, request, queryset):
     #queryset.update(status='p')
     for i in queryset:
-        openDoorAPI(i.id,"update",i.secret_key)
+        openDoorAPI(i.channel_name,"update",i.secret_key)
 
 update_softare.short_description = "Update software [OLD]"
 
 def get_log(modeladmin, request, queryset):
     #queryset.update(status='p')
     for i in queryset:
-        openDoorAPI(i.id,"sendlog",i.secret_key)
+        openDoorAPI(i.channel_name,"sendlog",i.secret_key)
 get_log.short_description = "Get log"
 
 def get_ping(modeladmin, request, queryset):
     #queryset.update(status='p')
     for i in queryset:
-        openDoorAPI(i.id,"ping",i.secret_key)
+        openDoorAPI(i.channel_name,"ping",i.secret_key)
 get_ping.short_description = "Send ping"
 
 class DeviceManager(admin.ModelAdmin):

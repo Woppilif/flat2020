@@ -117,14 +117,22 @@ def device(request,dkey):
         data["id"] = obj.pk
         return JsonResponse(data,status=200)
 
-def openDoorAPI(flat_id,message = "hello",appid='key'):
-    print(flat_id,message,appid)
+def openDoorAPI(channel_name,message = "hello",appid='key'):
+    print(channel_name,message,appid)
     channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)("chat_{0}".format(flat_id), {
+
+    async_to_sync(channel_layer.send)(channel_name, {
+            'type': 'channel_message',
+            'message': message,
+            'appid' : appid
+    })
+    '''
+    async_to_sync(channel_layer.group_send)("{0}".format(channel_name), {
         'type': 'channel_message',
         'message': json.dumps(message),
         'appid' : appid
     })
+    '''
     return True
 
 def sendMessageToAllAPI(flat_id,message = "hello"):

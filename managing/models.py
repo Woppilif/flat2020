@@ -53,13 +53,14 @@ class Devices(models.Model):
     created_at = models.DateTimeField(null=True,blank=True,default=None)
     status = models.BooleanField(null=True,default=False,validators=[device_status])
     description = models.CharField(max_length=60, blank=True, null=True,default=None)
-
+    channel_name = models.CharField(max_length=60, blank=True, null=True,default=None)
     class Meta:
         verbose_name = 'Устройство'
         verbose_name_plural = 'Устройства'
 
-    def setStatus(self,status):
+    def update(self,status,channel_name=""):
         self.status = status
+        self.channel_name = channel_name
         self.save()
         return self
 
