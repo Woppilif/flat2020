@@ -11,7 +11,7 @@
     
       <div class="container">
           <div class="row">
-            
+              {% if device is not None%}
               <div class="col-md-8">
                 <form method='POST' action="#">
                     {% csrf_token %}
@@ -21,7 +21,12 @@
             
               <div class="col-md-4 padd">
                 <button class="btn btn-lg btn-block btn-secondary" data-toggle="modal" data-target="#infoModal">Информация</button>
-            </div>
+              </div>
+              {%else%}
+              <div class="col-md-12">
+                <button class="btn btn-lg btn-block btn-secondary" data-toggle="modal" data-target="#infoModal">Информация</button>
+              </div>
+              {%endif%}
           </div>
       </div>
   
@@ -40,7 +45,7 @@
             <p class="lead">{{renta.flat.hint}} </p>
             <p class="lead">Начало: {{renta.start}}</p>
             <p class="lead">Окончание: {{renta.end}}</p>
-            {% if device.status is False%}
+            {% if device is not None and device.status is False%}
               <p  class="lead" style="color: red;">Внимание! Связь электронного замка и нашего сервера была потеряна. Если прошло более 2 минут с момента появления этого сообщения, обратитесь к менеджеру.</p>
             {%endif%}
         </div>

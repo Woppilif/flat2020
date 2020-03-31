@@ -12,7 +12,9 @@
             <li class="list-group-item d-flex justify-content-between lh-condensed">
               <div>
                 <h6 class="my-0">Квартира</h6>
-                <span class="text-muted">{{booking.flat}}</span>
+                <span class="text-muted">
+                  <a href="{% url 'managing:flat' booking.flat.pk %}">{{booking.flat}}</a> 
+                </span>
               </div>
               <span class="text-muted">{{booking.start}} - {{booking.end}}</span>
             </li>
@@ -20,13 +22,27 @@
               <div>
                 <h6 class="my-0">Статус аренды</h6>
                 <span class="text-muted">{{booking.get_status_display}}</span>
+
+                {% if booking.status == "waiting_for_capture" and booking.trial_key is not None%}
+                <form method='POST' action="#">
+                  {% csrf_token %}
+                  <button type="submit" name="approve" class="btn btn-primary">Подтвердить</button>
+                </form>
+                {%endif%}
               </div>
               <span class="text-muted">Стоимость: {{booking.getPrice}}</span>
             </li>
             <li class="list-group-item d-flex justify-content-between lh-condensed">
               <div>
                 <h6 class="my-0">Арендатор</h6>
-                <span class="text-muted">{{booking.rentor}}</span>
+                <span class="text-muted"><a href="{% url 'managing:user' booking.rentor.pk %}">{{booking.rentor}}</a></span>
+              </div>
+              <span class="text-muted"></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between lh-condensed">
+              <div>
+                <h6 class="my-0">Количество человек</h6>
+                <span class="text-muted">{{booking.person_amount}}</span>
               </div>
               <span class="text-muted"></span>
             </li>
@@ -48,13 +64,24 @@
               </div>
               <span class="text-success">-$5</span>
             </li>-->
-            {% for item in transactions %}
-            <li class="list-group-item d-flex justify-content-between">
-              <span>Транзакция: {{item.date}} {{item.get_payment_type_display}} {{item.get_status_display}}</span>
-              <strong>{{item.price}}</strong>
-            </li>
-            {%endfor%}
           </ul>
+
+          <h3>Совершенные платежи</h3>
+  <table class="table" id="book-table">
+    <thead>
+      <tr>
+        <th>Пользователь</th>
+        <th>Аренда</th>
+        <th>Тип операции</th>
+        <th>Сумма</th>
+        <th>Дата</th>
+        <th>Стоимость</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% include 'trial/includes/transactions_list.html' %}
+    </tbody>
+  </table>
     </div>
 </section>
 <script>

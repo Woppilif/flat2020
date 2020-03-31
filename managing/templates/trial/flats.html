@@ -1,0 +1,50 @@
+{% extends 'managing/includes/header.html' %}
+
+{% load static %}
+{% block javascript %}
+<script src="{% static 'managing/js/managers.js' %}"></script>
+{% endblock %}
+{% block content %}
+
+<section class="contr" id="contr">
+      
+  <div class="container">
+
+  <h1 class="page-header">Квартиры</h1>
+
+  <form method='GET' action="#">
+    {% csrf_token %}
+    <div  class="row">
+      <div  class="col-md-9">
+        <input type="text" name="address" class="form-control" placeholder="Адрес квартиры">
+      </div>
+      <div  class="col-md-3">
+        <button type="submit" name="approve" class="btn btn-primary">Подтвердить</button>
+      </div>
+    </div>
+  </form>
+</br>
+  <table class="table" id="book-table">
+    <thead>
+      <tr>
+        <th>Адрес</th>
+        <th>Текущий статус</th>
+        <th>Ближайший заезд</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% include 'trial/includes/flats_list.html' %}
+    </tbody>
+  </table>
+
+  <div class="modal fade" id="modal-book">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+      </div>
+    </div>
+  </div>
+
+</div>
+</section>
+{% endblock %}

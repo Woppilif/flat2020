@@ -33,6 +33,7 @@ LOGOUT_REDIRECT_URL = '/accounts/login'
 # Application definition
 
 INSTALLED_APPS = [
+    'partners.apps.PartnersConfig',
     'payments.apps.PaymentsConfig',
     'booking.apps.BookingConfig',
     'catalog.apps.CatalogConfig',

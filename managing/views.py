@@ -1,4 +1,6 @@
-from booking.models import Booking
+from booking.models import Booking, BookingRate
+from catalog.models import Flats
+from payments.models import Transactions
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from managing.forms import RentFormEx
@@ -10,7 +12,7 @@ from payments.models import Transactions
 import hashlib
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
-
+from django.contrib.auth.models import User
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from managing import consumers
@@ -36,7 +38,44 @@ def checkRoleManager(function):
 @checkRoleManager
 def index(request):
     rents = Booking.objects.filter(trial_key__isnull=True).order_by('-end')
+    if request.method == "GET":
+        if "address" in request.GET:
+            rents = rents.filter(flat__address__contains=request.GET['address'])
+        if "start" in request.GET and "end" in request.GET:
+            if request.GET['end'] != "" and request.GET['start'] !="":
+                rents = rents.filter(start__gte=request.GET['start'],end__lte=request.GET['end'])
+        elif "start" in request.GET:
+            if request.GET['start'] != "":
+                rents = rents.filter(start__gte=request.GET['start']) 
+        elif "end" in request.GET:
+            if request.GET['end'] != "":
+                rents = rents.filter(end__lte=request.GET['end'])
+        if "rentor" in request.GET:
+            rents = rents.filter(rentor__email__contains=request.GET['rentor'])
     return render(request,"trial/index.html",{"rents":rents})
+
+@login_required(login_url='/accounts/login/')
+@checkRoleManager
+def flats(request):
+    flats = Flats.objects.filter(partner=request.user.workers.partner)
+    if request.method == "GET":
+        if "address" in request.GET:
+            flats = flats.filter(address__contains=request.GET['address'])
+    return render(request,"trial/flats.html",{"flats":flats})
+
+@login_required(login_url='/accounts/login/')
+@checkRoleManager
+def flat(request,pk):
+    flat = get_object_or_404(Flats,pk=pk,partner=request.user.workers.partner)
+    rents = Booking.objects.filter(flat=flat)
+    booking_reviews = BookingRate.objects.filter(booking__flat__partner=request.user.workers.partner,booking__flat=flat)
+    return render(request,"trial/flat.html",{"flat":flat,"rents":rents,"booking_reviews":booking_reviews})
+
+@login_required(login_url='/accounts/login/')
+@checkRoleManager
+def reviews(request):
+    booking_reviews = BookingRate.objects.filter(booking__flat__partner=request.user.workers.partner)
+    return render(request,"trial/reviews.html",{"booking_reviews":booking_reviews})
 
 @login_required(login_url='/accounts/login/')
 @checkRoleManager
@@ -73,8 +112,18 @@ def trials(request):
 
 @login_required(login_url='/accounts/login/')
 @checkRoleManager
+def user_page(request,pk):
+    user = get_object_or_404(User,pk=pk)
+    users = Documents.objects.filter(user=user).order_by('-status')
+    rents = Booking.objects.filter(rentor=user)
+    transactions = Transactions.objects.filter(user=user)
+    booking_reviews = BookingRate.objects.filter(booking__rentor=user)
+    return render(request,"trial/users/user_page.html",{"user":user,"users":users,"rents":rents,"transactions":transactions,"booking_reviews":booking_reviews})
+
+@login_required(login_url='/accounts/login/')
+@checkRoleManager
 def users(request):
-    users = Documents.objects.filter(status=None)
+    users = Documents.objects.filter().order_by('-status')
     if request.method == "GET":
         if request.GET.get("status") is not None and request.GET.get("user_id") is not None:
             user = users.filter(status=None,user_id=int(request.GET.get("user_id"))).first()
@@ -100,6 +149,12 @@ def devices(request):
 def rentaInfo(request,pk):
     booking = get_object_or_404(Booking, pk = pk)
     transactions = Transactions.objects.filter(booking=booking)
+    if request.method == 'POST':
+        if "approve" in request.POST:
+            booking.status = "succeeded"
+            booking.trial_key = None
+            booking.paid = True
+            booking.save()
     return render(request,"trial/booking.html",{"booking":booking,"transactions":transactions})
 
 def device(request,dkey):
@@ -119,6 +174,8 @@ def device(request,dkey):
 
 def openDoorAPI(channel_name,message = "hello",appid='key'):
     print(channel_name,message,appid)
+    if channel_name is None:
+        return False
     channel_layer = get_channel_layer()
 
     async_to_sync(channel_layer.send)(channel_name, {

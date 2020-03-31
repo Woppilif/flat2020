@@ -11,7 +11,7 @@ class BookingExt(models.Manager):
     def getCurrentUserRenta(self,user):
         return self.filter(~Q(status='canceled'),rentor=user).last()
     
-    def createBooking(self,user,flat,days):
+    def createBooking(self,user,flat,days,person):
         current = self.getCurrentRenta(flat)
         if current is not None:
             return None
@@ -29,6 +29,7 @@ class BookingExt(models.Manager):
                 start = date,
                 end = date + timedelta(days=days),
                 status = 'pending',
+                person_amount = person,
                 paid=False,
                 created_at = date
             ).setDates().setBookingEnding()
@@ -74,6 +75,7 @@ class Booking(models.Model):
     created_at = models.DateTimeField(null=True,blank=True,default=None)
     trial_key = models.CharField(max_length=80, blank=True, null=True,default=None)
     deal_id = models.IntegerField(verbose_name="ID сделки в битрикс",blank=True, null=True,default=0)
+    person_amount = models.IntegerField(verbose_name="Количество человек",blank=True, null=True,default=0)
     extended = BookingExt()
     objects = models.Manager()
     
@@ -192,6 +194,7 @@ class Booking(models.Model):
         return self.flat.deposit
 
     def createDeal(self):
+        '''
         payload = {
             'id':self.flat.bxcal_id,
             'begin_date':self.start,
@@ -209,6 +212,7 @@ class Booking(models.Model):
         if page.status_code == 200:
             self.deal_id = int(page.text)
             self.save()
+        '''
         return self
 
     def cancelDeal(self):

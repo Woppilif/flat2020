@@ -25,6 +25,7 @@ class Workers(models.Model):
         (1, 'Менеджер'),
         (2, 'Клининг'),
         (3, 'Мастер'),
+        (4, 'Директор'),
     )
     partner = models.ForeignKey(Partners, on_delete=models.CASCADE)
     account = models.OneToOneField(User, on_delete=models.CASCADE)

@@ -36,6 +36,11 @@
             <li class="nav-item">
                 <a class="nav-link js-scroll-trigger" href="{%url 'logout' %}">Выход</a>
             </li>
+            {% if user.workers.role == 1 %}
+              <li class="nav-item">
+                <a class="nav-link js-scroll-trigger" href="{%url 'managing:index' %}">Управление</a>
+              </li>
+            {%endif%}
             {%else%}
             <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{%url 'catalog:index' %}">Главная</a></li>
             <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{%url 'catalog:user_agreement' %}">Условия пользования</a></li>

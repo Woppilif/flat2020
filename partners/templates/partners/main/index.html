@@ -1,0 +1,30 @@
+{% extends 'partners/includes/header.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block javascript %}
+<script src="{% static 'managing/js/managers.js' %}"></script>
+{% endblock %}
+{% block content %}
+
+<section class="contr" id="contr">
+    <div class="container">
+        
+        <form method='POST' action="#">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group{% if field.errors %} has-error{% endif %}">
+                <label for="{{ field.id_for_label }}">{{field.label}}</label>
+                <div class="input-group mb-3">
+                    {% render_field field class="form-control" autocomplete="off" %}           
+                </div>
+                {% for error in field.errors %}
+                <p class="help-block">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+
+    </div>
+</section>
+{% endblock %}

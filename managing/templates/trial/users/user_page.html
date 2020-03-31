@@ -1,0 +1,93 @@
+{% extends 'managing/includes/header.html' %}
+
+{% load static %}
+{% block javascript %}
+<script src="{% static 'managing/js/managers.js' %}"></script>
+{% endblock %}
+{% block content %}
+
+<section class="contr" id="contr">
+      
+  <div class="container">
+
+  <h1 class="page-header">{{user}} 
+
+  {%if user.documents.yakey is not None or user.documents.yakey != ""%}
+  <span class="badge badge-success">Карта привязана</span>
+  {%else%}
+  <span class="badge badge-danger">Карта не привязана</span>
+  {%endif%}</h1>
+
+  <table class="table" id="book-table">
+    <thead>
+      <tr>
+        <th>Имя Фамилия</th>
+        <th>Фото #1</th>
+        <th>Фото #2</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% include 'trial/users/users_list.html' %}
+    </tbody>
+  </table>
+
+  <h3>Совершенные аренды</h3>
+  <table class="table" id="book-table">
+    <thead>
+      <tr>
+        <th>Адрес</th>
+        <th>Начало</th>
+        <th>Окончание</th>
+        <th>Пользователь</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% include 'trial/includes/partial_book_list.html' %}
+    </tbody>
+  </table>
+
+  <h3>Совершенные платежи</h3>
+  <table class="table" id="book-table">
+    <thead>
+      <tr>
+        <th>Пользователь</th>
+        <th>Аренда</th>
+        <th>Тип операции</th>
+        <th>Сумма</th>
+        <th>Дата</th>
+        <th>Стоимость</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% include 'trial/includes/transactions_list.html' %}
+    </tbody>
+  </table>
+
+  <h3>Оставленные отзывы</h3>
+          <table class="table" id="book-table">
+            <thead>
+              <tr>
+                <th>Квартира</th>
+                <th>Аренда</th>
+                <th>Пользователь</th>
+                <th>Чистота</th>
+                <th>Персонал</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% include 'trial/includes/rates_list.html' %}
+            </tbody>
+          </table>
+
+  <div class="modal fade" id="modal-book">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+      </div>
+    </div>
+  </div>
+
+</div>
+</section>
+{% endblock %}

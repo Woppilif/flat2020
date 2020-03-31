@@ -15,7 +15,7 @@
             </div>
             <p class="card-text mb-auto">
             </br>
-            {{renta.flat.partnerInfo.org_name}}, именуемая в дальнейшем Принимающая сторона, в лице {{renta.flat.partnerInfo.hmrank}} {{renta.flat.partnerInfo.headmaster}}, действующего на основании {{renta.flat.partnerInfo.document}}, с одной стороны, и {{user.get_full_name }}, именуемый в дальнейшем Гость, с другой стороны, составили настоящий Акт о следующем:
+            {{renta.flat.partner.org_name}}, именуемая в дальнейшем Принимающая сторона, в лице {{renta.flat.partner.hmrank}} {{renta.flat.partner.headmaster}}, действующего на основании {{renta.flat.partner.document}}, с одной стороны, и {{user.get_full_name }}, именуемый в дальнейшем Гость, с другой стороны, составили настоящий Акт о следующем:
             </br>
             1. Принимающая сторона передала, а Гость принял {{renta.flat.rooms}} комнатную квартиру на период с {{renta.start}} по {{renta.end}}, расположенную по адресу: {{renta.flat.addressPartOne}} {{renta.flat.addressPartTwo}}, во временное владение и пользование, а также следующее имущество:
           </br>
@@ -36,9 +36,11 @@
     <form method='POST' action="#">
       {% csrf_token %}
     <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+      {% if device is not None%}
       <div class="col-md-12 d-4 d-lg-block">
         <button type="submit" class="btn btn-lg btn-block btn-outline-secondary" name="open">Открыть дверь | {{renta.getRemainingBookingTime}}</button>
       </div>
+      {%endif%}
   </div>
     </div>
 
@@ -50,17 +52,45 @@
   <footer class="py-1 bg-dark fixed-bottom">
     <div class="container">
         <div class="row">
-            <div class="col-md-8">
-                <button type="submit" class="btn btn-lg btn-block btn-primary" name="pay">Оплатить {{renta.getPrice}}₽</button>
-            </div>
+            
             <div class="col-md-4 padd">
                 <button type="submit" class="btn btn-lg btn-block btn-secondary" name="cancel">Отмена</button>
+            </div>
+          </form>
+            <div class="col-md-8">
+                <button data-toggle="modal" data-target="#exampleModal" class="btn btn-lg btn-block btn-primary" name="pay">Оплатить {{renta.getPrice}}₽</button>
             </div>
         </div>
     </div>
     <!-- /.container -->
   </footer>
-</form>
+
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Оплата аренды</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Вы можете оплатить любым удобным для Вас способом.
+        <form method='POST' action="#">
+          {% csrf_token %}
+        <button type="submit" name="pay" class="btn btn-primary">Оплата через Яндекс.Касса</button>
+        <button type="submit" name="tinkoff" class="btn btn-success">Перевод на карту</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block javascript %}

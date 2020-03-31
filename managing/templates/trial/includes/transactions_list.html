@@ -1,0 +1,30 @@
+{% for item in transactions %}
+<tr>
+  <td>
+    <a href="{% url 'managing:user' item.user.pk %}">{{item.user}}</a> 
+   </td>
+   <td>
+        {% if item.booking is not None%}
+        <a href="{% url 'managing:booking' item.booking.pk %}">{{item.booking.flat}}</a>
+        {%else%}
+        -
+        {%endif%}
+   </td>
+   <td>
+        {{item.get_payment_type_display}}
+    </td>
+   <td>
+     {{item.price}}
+   </td>
+   <td>
+     {{item.date}}
+   </td>
+   <td>
+    {{item.get_status_display}}
+  </td>  
+</tr>
+{% empty %}
+<tr>
+  <td colspan="6" class="text-center bg-warning">-</td>
+</tr>
+{% endfor %}

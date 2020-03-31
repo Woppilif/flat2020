@@ -1,8 +1,17 @@
 {% for item in rents %}
 <tr>
   <td>
-   <a href="{% url 'managing:booking' item.pk %}">{{item}}</a> 
-  </td> 
+    <a href="{% url 'managing:booking' item.pk %}">{{item.flat}}</a> 
+   </td>
+   <td>
+     {{item.start}}
+   </td>
+   <td>
+     {{item.end}}
+   </td>
+   <td>
+     {{item.rentor}}
+   </td> 
 </tr>
 {% empty %}
 <tr>

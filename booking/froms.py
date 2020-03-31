@@ -9,20 +9,24 @@ class RentForm(forms.Form):
         self.user = user
 
     end = forms.IntegerField()
+    person_amount = forms.IntegerField()
 
     def clean_end(self):
         end = int(self.cleaned_data['end'])
         if not 1 <= end <= Booking.extended.getDaysBeforeRenta(self.current_flat):
             raise  ValidationError("Превышено максимально возможное количество дней.")
         return end
-
+    
+    def clean_person_amount(self):
+        print(int(self.cleaned_data['person_amount']))
+        return int(self.cleaned_data['person_amount'])
     
     def clean(self):
         if self.user.documents.status is not True:
             raise  ValidationError("Ваш аккаунт еще не прошёл проверку модератором поэтому Вы не можете забронировать квартиру")   
 
     def save(self, commit=True):
-        booking = Booking.extended.createBooking(self.user,self.current_flat,self.cleaned_data['end'])
+        booking = Booking.extended.createBooking(self.user,self.current_flat,self.cleaned_data['end'],self.cleaned_data['person_amount'])
         booking.createDeal()
         return booking
 

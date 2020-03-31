@@ -21,7 +21,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             print(self.channel_name)
             await self.setDeviceStatus(self.device[0],True,self.channel_name)
             await self.accept()
+            
             print("=== Connected Device ID: {0} by Partner ID: {1} at {2}".format(self.room_name,self.room_group_name,datetime.now()))
+        else:
+            await self.disconnect(close_code=100)
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -30,9 +33,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 self.room_group_name,
                 self.channel_name
             )
-        await self.setDeviceStatus(self.device[0],False,self.channel_name)
-        await self.addLog(self.room_name,comment="Disconnected")
-        print("Disconnect {0} {1}".format(self.room_group_name,datetime.now()))
+            await self.setDeviceStatus(self.device[0],False,self.channel_name)
+            await self.addLog(self.room_name,comment="Disconnected")
+            print("Disconnect {0} {1}".format(self.room_group_name,datetime.now()))
+        else:
+            await self.addLog(self.room_name,comment="Connection rejected")
+        
 
     @database_sync_to_async
     def getDevice(self,id):
@@ -64,7 +70,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': "{0} {1}".format(message,datetime.now())
+                'message': "{0} {1} {2}".format(message,datetime.now(),self.room_name)
             }
         )
         
@@ -133,7 +139,7 @@ class BotConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': "{0} {1}".format(message,datetime.now())
+                'message': "{0} {1} {2}".format(message,datetime.now(),self.room_name)
             }
         )
         

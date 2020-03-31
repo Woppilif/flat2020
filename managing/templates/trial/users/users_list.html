@@ -1,6 +1,6 @@
 {% for item in users %}
 <tr>
-  <td>{{item.firstname}} {{item.lastname}} </br> {{item.phone_number}} </td>
+  <td><a href="{% url 'managing:user' item.pk %}">{{item.firstname}} {{item.lastname}}</a> </br> {{item.phone_number}} </td>
   
   <td>
     <a href="/media/{{item.image_one}}">
@@ -13,10 +13,14 @@
     </a>
   </td>
   <td>
+    {%if item.status is None%}
     <div class="btn-group-vertical">
       <a type="button" class="btn btn-success" href="{% url 'managing:users' %}?user_id={{item.user.pk}}&status=1">Активировать</a>
       <a type="button" class="btn btn-danger" href="{% url 'managing:users' %}?user_id={{item.user.pk}}&status=0">Удалить</a>
     </div>
+    {%else%}
+      {{item.get_status_display}}
+    {%endif%}
   </td>  
 </tr>
 

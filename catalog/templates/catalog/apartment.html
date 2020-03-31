@@ -56,6 +56,12 @@
           <input type="range" class="custom-range" min="1" max="{{untill}}" step="1" value="1" name="end" id="id_end" onchange="changeval()">
         </div>
       </div>
+      <div class="col-md-12 pt-4 pl-4 pr-4">
+        <div class="form-group">
+          <label for="id_end">Количество гостей: <strong id="personCount" >2 из 10</strong></label>
+          <input type="range" class="custom-range" min="1" max="10" step="1" value="2" name="person_amount" id="id_person_amount" onchange="changevalUsers()">
+        </div>
+      </div>
   </div>  
     </div>
   </section>
@@ -97,6 +103,13 @@
   {
     $("#daysCount").text(""+$("#id_end").val()+" из "+id_end.max+"");
     $("#continue").text("Забронировать "+$("#id_end").val()*price+"₽");
+  }
+
+  function changevalUsers()
+  {
+    $("#personCount").text(""+$("#id_person_amount").val()+" из "+id_person_amount.max+"");
+    console.warn(0);
+    //$("#continue").text("Забронировать "+$("#id_end").val()*price+"₽");
   }
 
   /*function addDays(date, days) {

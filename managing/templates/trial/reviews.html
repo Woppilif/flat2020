@@ -1,0 +1,40 @@
+{% extends 'managing/includes/header.html' %}
+
+{% load static %}
+{% block javascript %}
+<script src="{% static 'managing/js/managers.js' %}"></script>
+{% endblock %}
+{% block content %}
+
+<section class="contr" id="contr">
+      
+  <div class="container">
+
+  <h1 class="page-header">Отзывы пользователей</h1>
+
+  <table class="table" id="book-table">
+    <thead>
+      <tr>
+        <th>Квартира</th>
+        <th>Аренда</th>
+        <th>Пользователь</th>
+        <th>Чистота</th>
+        <th>Персонал</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% include 'trial/includes/rates_list.html' %}
+    </tbody>
+  </table>
+
+  <div class="modal fade" id="modal-book">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+      </div>
+    </div>
+  </div>
+
+</div>
+</section>
+{% endblock %}

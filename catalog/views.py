@@ -38,8 +38,9 @@ def apartment(request,pk=None):
     if request.method == 'POST':
         if request.user.is_authenticated is False:
             return redirect('login')
-        if request.user.documents.yakey == "" or request.user.documents.yakey is None:
-            return redirect("payments:index")
+        '''
+        
+        '''
         form = RentForm(data=request.POST, current_flat=flat, user=request.user)
         if form.is_valid():
             renta = form.save()
@@ -49,6 +50,8 @@ def apartment(request,pk=None):
     return render(request, 'catalog/apartment.html', {"flat":flat,"untill":untill})
 
 def index(request):
+    if request.user.is_authenticated is True:
+        return redirect('catalog:map')
     flats = Flats.objects.filter(status=True)
     flats = Booking.extended.getAll(flats)
     return render(request, 'catalog/index.html', {"flats":flats})

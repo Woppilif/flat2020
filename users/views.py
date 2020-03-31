@@ -16,7 +16,9 @@ def sendToBooking(function):
     def decorator(request, *args, **kwargs):
         r = Booking.extended.getCurrentUserRenta(request.user)
         if r is not None:
-            if r.status == "pending":
+            if r.status == "created":
+                return redirect('booking:act',pk=r.pk)
+            elif r.status == "pending":
                 return redirect('booking:act',pk=r.pk)
             elif r.status == "waiting_for_capture":
                 return redirect('booking:act',pk=r.pk)

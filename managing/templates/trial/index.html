@@ -11,11 +11,35 @@
   <div class="container">
 
   <h1 class="page-header">Текущие аренды</h1>
-
+  <form method='GET' action="#">
+    {% csrf_token %}
+    <div  class="row">
+      <div  class="col-md-2">
+        <input type="text" name="address" class="form-control" placeholder="Адрес квартиры">
+      </div>
+      <div  class="col-md-3">
+        <input type="date" name="start" class="form-control" placeholder="Начало аренды">
+      </div>
+      <div  class="col-md-3">
+        <input type="date" name="end" class="form-control" placeholder="Окончание аренды">
+      </div>
+      <div  class="col-md-2">
+        <input type="text" name="rentor" class="form-control" placeholder="Пользователь">
+      </div>
+      <div  class="col-md-2">
+        <button type="submit" name="approve" class="btn btn-primary">Подтвердить</button>
+      </div>
+    </div>
+  </form>
+</br>
   <table class="table" id="book-table">
     <thead>
       <tr>
         <th>Адрес</th>
+        <th>Начало</th>
+        <th>Окончание</th>
+        <th>Стоимость</th>
+        <th>Пользователь</th>
       </tr>
     </thead>
     <tbody>
